@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="BUSSY 67! — An interactive journey through humanity's abandoned machines on the Moon and Mars."
+    >
+
+    <title>BUSSY 67! — Ghost Relics of the Solar System</title>
+
+
+    <!-- =========================================================
+         FONTS
+         ========================================================= -->
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+
+    <!-- =========================================================
+         YOUR CSS
+         ========================================================= -->
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+
+<body>
+
+    <!-- =========================================================
+         CINEMATIC BACKGROUND SYSTEM
+
+         JavaScript changes the background according to
+         the currently active scene.
+
+         You can think of this as the "cinematic camera".
+         ========================================================= -->
+
+    <div
+        class="cinematic-background"
+        aria-hidden="true"
+    >
+
+        <div
+            class="background-image background-image-a"
+            id="backgroundA"
+        ></div>
+
+        <div
+            class="background-image background-image-b"
+            id="backgroundB"
+        ></div>
+
+        <div class="background-overlay"></div>
+
+        <div class="stars"></div>
+
+        <div class="vignette"></div>
+
+    </div>
+
+
+    <!-- =========================================================
+         TOP HUD
+         ========================================================= -->
+
+    <header class="site-header">
+
+        <div class="brand">
+            <span class="brand-mark"></span>
+
+            <span>BUSSY 67!</span>
+        </div>
+
+        <div
+            class="scene-counter"
+            id="sceneCounter"
+        >
+            01 / 11
+        </div>
+
+    </header>
+
+
+    <!-- =========================================================
+         AUDIO STATUS
+         ========================================================= -->
+
+    <button
+        class="audio-control"
+        id="audioControl"
+        type="button"
+        aria-label="Toggle ambient sound"
+    >
+
+        <span
+            class="audio-bars"
+            id="audioBars"
+        >
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+        </span>
+
+        <span id="audioStatus">
+            SOUND ON
+        </span>
+
+    </button>
+
+
+    <!-- =========================================================
+         MAIN STORY
+         ========================================================= -->
+
+    <main id="story">
+
+
+        <!-- =====================================================
+             SCENE 01
+             LANDING PAGE
+             ===================================================== -->
+
+        <section
+            class="scene scene-landing"
+            id="scene-1"
+            data-scene="1"
+            data-type="landing"
+            data-background="bus"
+        >
+
+            <div class="scene-inner landing-inner">
+
+                <div class="landing-copy">
+
+                    <p class="eyebrow">
+                        A CINEMATIC SPACE JOURNEY
+                    </p>
+
+                    <h1 class="landing-title">
+                        BUSSY
+                        <span>67!</span>
+                    </h1>
+
+                    <p class="landing-subtitle">
+                        The school bus that takes you
+                        where no school bus has gone before.
+                    </p>
+
+
+                    <button
+                        class="primary-button start-button"
+                        id="startButton"
+                        type="button"
+                    >
+
+                        <span>
+                            LET'S START EXPLORING
+                        </span>
+
+                        <span class="button-arrow">
+                            →
+                        </span>
+
+                    </button>
+
+                </div>
+
+
+                <div class="landing-bus">
+
+                    <!--
+                    =================================================
+                    BUS IMAGE PLACEHOLDER
+
+                    REPLACE THIS:
+
+                    images/bus.jpg
+
+                    with your own cartoon-style school bus image.
+
+                    Recommended:
+                    transparent PNG/WebP if possible.
+                    =================================================
+                    -->
+
+                    <img
+                        src="images/bus.jpg"
+                        alt="Cartoon school bus ready for a space journey"
+                    >
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             SCENE 02
+             JOURNEY TO THE MOON
+             ===================================================== -->
+
+        <section
+            class="scene journey-scene"
+            id="scene-2"
+            data-scene="2"
+            data-type="journey"
+            data-background="space"
+        >
+
+            <div class="scene-inner journey-inner">
+
+                <p class="eyebrow">
+                    BUSSY 67! / MISSION 01
+                </p>
+
+                <h2 class="journey-title">
+                    TRAVELLING
+                    <span>TO THE MOON</span>
+                </h2>
+
+                <div class="journey-route">
+
+                    <span>EARTH</span>
+
+                    <div class="route-line">
+                        <div class="route-dot"></div>
+                    </div>
+
+                    <span>MOON</span>
+
+                </div>
+
+                <p class="journey-caption">
+                    Buckle up. Our first stop is
+                    a place where footprints can last
+                    for millions of years.
+                </p>
+
+                <div class="scroll-hint">
+                    KEEP SCROLLING
+                    <span>↓</span>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             SCENE 03
+             APOLLO 11 EAGLE
+             ===================================================== -->
+
+        <section
+            class="scene artifact-scene"
+            id="scene-3"
+            data-scene="3"
+            data-type="artifact"
+            data-background="moon"
+            data-artifact="eagle"
+        >
+
+            <div class="scene-inner artifact-layout">
+
+                <div class="artifact-copy">
+
+                    <p class="eyebrow">
+                        THE MOON / 1969
+                    </p>
+
+                    <p class="artifact-number">
+                        01
+                    </p>
+
+                    <h2 class="artifact-title">
+                        APOLLO 11
+                        <span>EAGLE DESCENT STAGE</span>
+                    </h2>
+
+                    <p class="artifact-description">
+                        The machine that helped carry
+                        humanity to the surface of another world.
+                    </p>
+
+
+                    <div class="artifact-buttons">
+
+                        <button
+                            class="primary-button listen-button"
+                            type="button"
+                            data-action="listen"
+                            data-artifact="eagle"
+                        >
+                            <span>LISTEN MY STORY</span>
+                            <span>▶</span>
+                        </button>
+
+                        <button
+                            class="secondary-button"
+                            type="button"
+                            data-action="info"
+                            data-artifact="eagle"
+                        >
+                            READ ABOUT ME
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <div class="artifact-visual">
+
+                    <!--
+                    =================================================
+                    APOLLO 11 IMAGE
+
+                    REPLACE:
+
+                    images/eagle.png
+
+                    with your chosen NASA/authorized image or
+                    illustration of the Apollo 11 descent stage.
+                    =================================================
+                    -->
+
+                    <img
+                        src="images/eagle.png"
+                        alt="Apollo 11 Lunar Module Eagle descent stage"
+                        class="artifact-image"
+                    >
+
+                    <div class="object-glow"></div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             SCENE 04
+             LUNAR ROVING VEHICLE
+             ===================================================== -->
+
+        <section
+            class="scene artifact-scene"
+            id="scene-4"
+            data-scene="4"
+            data-type="artifact"
+            data-background="moon"
+            data-artifact="lunarRover"
+        >
+
+            <div class="scene-inner artifact-layout">
+
+                <div class="artifact-copy">
+
+                    <p class="eyebrow">
+                        THE MOON / 1971
+                    </p>
+
+                    <p class="artifact-number">
+                        02
+                    </p>
+
+                    <h2 class="artifact-title">
+                        LUNAR
+                        <span>ROVING VEHICLE</span>
+                    </h2>
+
+                    <p class="artifact-description">
+                        Humanity's first off-world vehicle
+                        carried astronauts farther across
+                        the lunar surface.
+                    </p>
+
+
+                    <div class="artifact-buttons">
+
+                        <button
+                            class="primary-button listen-button"
+                            type="button"
+                            data-action="listen"
+                            data-artifact="lunarRover"
+                        >
+                            <span>LISTEN MY STORY</span>
+                            <span>▶</span>
+                        </button>
+
+                        <button
+                            class="secondary-button"
+                            type="button"
+                            data-action="info"
+                            data-artifact="lunarRover"
+                        >
+                            READ ABOUT ME
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <div class="artifact-visual">
+
+                    <!--
+                    =================================================
+                    LUNAR ROVER IMAGE
+
+                    REPLACE:
+
+                    images/lunar-rover.png
+                    =================================================
+                    -->
+
+                    <img
+                        src="images/lunar-rover.png"
+                        alt="Apollo Lunar Roving Vehicle"
+                        class="artifact-image"
+                    >
+
+                    <div class="object-glow"></div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             SCENE 05
+             ALSEP
+             ===================================================== -->
+
+        <section
+            class="scene artifact-scene"
+            id="scene-5"
+            data-scene="5"
+            data-type="artifact"
+            data-background="moon"
+            data-artifact="alsep"
+        >
+
+            <div class="scene-inner artifact-layout">
+
+                <div class="artifact-copy">
+
+                    <p class="eyebrow">
+                        THE MOON / APOLLO SCIENCE
+                    </p>
+
+                    <p class="artifact-number">
+                        03
+                    </p>
+
+                    <h2 class="artifact-title">
+                        ALSEP
+                        <span>SCIENCE STATIONS</span>
+                    </h2>
+
+                    <p class="artifact-description">
+                        Instruments left behind to listen,
+                        measure and study the Moon long
+                        after the astronauts had gone home.
+                    </p>
+
+
+                    <div class="artifact-buttons">
+
+                        <button
+                            class="primary-button listen-button"
+                            type="button"
+                            data-action="listen"
+                            data-artifact="alsep"
+                        >
+                            <span>LISTEN MY STORY</span>
+                            <span>▶</span>
+                        </button>
+
+                        <button
+                            class="secondary-button"
+                            type="button"
+                            data-action="info"
+                            data-artifact="alsep"
+                        >
+                            READ ABOUT ME
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <div class="artifact-visual">
+
+                    <!--
+                    =================================================
+                    ALSEP IMAGE
+
+                    REPLACE:
+
+                    images/alsep.png
+                    =================================================
+                    -->
+
+                    <img
+                        src="images/alsep.png"
+                        alt="Apollo Lunar Surface Experiment Package"
+                        class="artifact-image"
+                    >
+
+                    <div class="object-glow"></div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             SCENE 06
+             JOURNEY TO MARS
+             ===================================================== -->
+
+        <section
+            class="scene journey-scene"
+            id="scene-6"
+            data-scene="6"
+            data-type="journey"
+            data-background="space"
+        >
+
+            <div class="scene-inner journey-inner">
+
+                <p class="eyebrow">
+                    BUSSY 67! / MISSION 02
+                </p>
+
+                <h2 class="journey-title">
+                    TRAVELLING
+                    <span>TO MARS</span>
+                </h2>
+
+                <div class="journey-route">
+
+                    <span>MOON</span>
+
+                    <div class="route-line">
+                        <div class="route-dot"></div>
+                    </div>
+
+                    <span>MARS</span>
+
+                </div>
+
+                <p class="journey-caption">
+                    One small step was only the beginning.
+                    Now we're travelling much farther.
+                </p>
+
+                <div class="scroll-hint">
+                    KEEP SCROLLING
+                    <span>↓</span>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             SCENE 07
+             OPPORTUNITY
+             ===================================================== -->
+
+        <section
+            class="scene artifact-scene"
+            id="scene-7"
+            data-scene="7"
+            data-type="artifact"
+            data-background="mars"
+            data-artifact="opportunity"
+        >
+
+            <div class="scene-inner artifact-layout">
+
+                <div class="artifact-copy">
+
+                    <p class="eyebrow">
+                        MARS / 2004–2018
+                    </p>
+
+                    <p class="artifact-number">
+                        04
+                    </p>
+
+                    <h2 class="artifact-title">
+                        OPPORTUNITY
+                        <span>ROVER</span>
+                    </h2>
+
+                    <p class="artifact-description">
+                        Designed to survive 90 Martian days.
+                        It kept going for almost fifteen years.
+                    </p>
+
+
+                    <div class="artifact-buttons">
+
+                        <button
+                            class="primary-button listen-button"
+                            type="button"
+                            data-action="listen"
+                            data-artifact="opportunity"
+                        >
+                            <span>LISTEN MY STORY</span>
+                            <span>▶</span>
+                        </button>
+
+                        <button
+                            class="secondary-button"
+                            type="button"
+                            data-action="info"
+                            data-artifact="opportunity"
+                        >
+                            READ ABOUT ME
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <div class="artifact-visual">
+
+                    <!--
+                    =================================================
+                    OPPORTUNITY IMAGE
+
+                    REPLACE:
+
+                    images/opportunity.png
+                    =================================================
+                    -->
+
+                    <img
+                        src="images/opportunity.png"
+                        alt="NASA Opportunity rover"
+                        class="artifact-image"
+                    >
+
+                    <div class="object-glow"></div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             SCENE 08
+             SPIRIT
+             ===================================================== -->
+
+        <section
+            class="scene artifact-scene"
+            id="scene-8"
+            data-scene="8"
+            data-type="artifact"
+            data-background="mars"
+            data-artifact="spirit"
+        >
+
+            <div class="scene-inner artifact-layout">
+
+                <div class="artifact-copy">
+
+                    <p class="eyebrow">
+                        MARS / 2004–2010
+                    </p>
+
+                    <p class="artifact-number">
+                        05
+                    </p>
+
+                    <h2 class="artifact-title">
+                        SPIRIT
+                        <span>ROVER</span>
+                    </h2>
+
+                    <p class="artifact-description">
+                        A robotic explorer that helped reveal
+                        the ancient history of the Martian surface.
+                    </p>
+
+
+                    <div class="artifact-buttons">
+
+                        <button
+                            class="primary-button listen-button"
+                            type="button"
+                            data-action="listen"
+                            data-artifact="spirit"
+                        >
+                            <span>LISTEN MY STORY</span>
+                            <span>▶</span>
+                        </button>
+
+                        <button
+                            class="secondary-button"
+                            type="button"
+                            data-action="info"
+                            data-artifact="spirit"
+                        >
+                            READ ABOUT ME
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <div class="artifact-visual">
+
+                    <!--
+                    =================================================
+                    SPIRIT IMAGE
+
+                    REPLACE:
+
+                    images/spirit.png
+                    =================================================
+                    -->
+
+                    <img
+                        src="images/spirit.png"
+                        alt="NASA Spirit rover"
+                        class="artifact-image"
+                    >
+
+                    <div class="object-glow"></div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             SCENE 09
+             INSIGHT ROBOTIC ARM
+             ===================================================== -->
+
+        <section
+            class="scene artifact-scene"
+            id="scene-9"
+            data-scene="9"
+            data-type="artifact"
+            data-background="mars"
+            data-artifact="insight"
+        >
+
+            <div class="scene-inner artifact-layout">
+
+                <div class="artifact-copy">
+
+                    <p class="eyebrow">
+                        MARS / 2018–2022
+                    </p>
+
+                    <p class="artifact-number">
+                        06
+                    </p>
+
+                    <h2 class="artifact-title">
+                        INSIGHT
+                        <span>ROBOTIC ARM</span>
+                    </h2>
+
+                    <p class="artifact-description">
+                        Part of a robotic laboratory designed
+                        to investigate the deep interior of Mars.
+                    </p>
+
+
+                    <div class="artifact-buttons">
+
+                        <button
+                            class="primary-button listen-button"
+                            type="button"
+                            data-action="listen"
+                            data-artifact="insight"
+                        >
+                            <span>LISTEN MY STORY</span>
+                            <span>▶</span>
+                        </button>
+
+                        <button
+                            class="secondary-button"
+                            type="button"
+                            data-action="info"
+                            data-artifact="insight"
+                        >
+                            READ ABOUT ME
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <div class="artifact-visual">
+
+                    <!--
+                    =================================================
+                    INSIGHT IMAGE
+
+                    REPLACE:
+
+                    images/insight.png
+                    =================================================
+                    -->
+
+                    <img
+                        src="images/insight.png"
+                        alt="NASA InSight robotic arm"
+                        class="artifact-image"
+                    >
+
+                    <div class="object-glow"></div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             SCENE 10
+             RETURNING HOME
+             ===================================================== -->
+
+        <section
+            class="scene journey-scene"
+            id="scene-10"
+            data-scene="10"
+            data-type="journey"
+            data-background="space"
+        >
+
+            <div class="scene-inner journey-inner">
+
+                <p class="eyebrow">
+                    BUSSY 67! / FINAL JOURNEY
+                </p>
+
+                <h2 class="journey-title">
+                    RETURNING
+                    <span>HOME</span>
+                </h2>
+
+                <div class="journey-route">
+
+                    <span>MARS</span>
+
+                    <div class="route-line">
+                        <div class="route-dot"></div>
+                    </div>
+
+                    <span>EARTH</span>
+
+                </div>
+
+                <p class="journey-caption">
+                    The journey ends.
+                    The machines remain.
+                    And their stories continue.
+                </p>
+
+                <div class="scroll-hint">
+                    ONE LAST STOP
+                    <span>↓</span>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             SCENE 11
+             ENDING
+             ===================================================== -->
+
+        <section
+            class="scene ending-scene"
+            id="scene-11"
+            data-scene="11"
+            data-type="ending"
+            data-background="bus"
+        >
+
+            <div class="scene-inner ending-inner">
+
+                <p class="eyebrow">
+                    MISSION COMPLETE
+                </p>
+
+                <h2 class="ending-title">
+                    SEE Y'ALL
+                    <span>LATER</span>
+                </h2>
+
+                <p class="ending-text">
+                    The machines may be silent,
+                    but they are not forgotten.
+                </p>
+
+                <button
+                    class="secondary-button replay-button"
+                    id="replayButton"
+                    type="button"
+                >
+                    RIDE AGAIN
+                </button>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+
+    <!-- =========================================================
+         INFORMATION PORTAL / MODAL
+         ========================================================= -->
+
+    <div
+        class="info-modal"
+        id="infoModal"
+        aria-hidden="true"
+    >
+
+        <div class="modal-backdrop"></div>
+
+        <div
+            class="modal-panel"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="modalTitle"
+        >
+
+            <button
+                class="modal-close"
+                id="modalClose"
+                type="button"
+                aria-label="Close information"
+            >
+                ×
+            </button>
+
+
+            <div class="modal-header">
+
+                <p
+                    class="eyebrow"
+                    id="modalEyebrow"
+                >
+                    NASA / OBJECT
+                </p>
+
+                <h2 id="modalTitle">
+                    Object
+                </h2>
+
+                <p
+                    class="modal-subtitle"
+                    id="modalSubtitle"
+                >
+                    Object information
+                </p>
+
+            </div>
+
+
+            <div class="modal-content">
+
+                <div class="data-grid">
+
+                    <div class="data-card">
+
+                        <span>LANDED / DEPLOYED</span>
+
+                        <strong id="modalYear">
+                            —
+                        </strong>
+
+                    </div>
+
+                    <div class="data-card">
+
+                        <span>MISSION</span>
+
+                        <strong id="modalMission">
+                            —
+                        </strong>
+
+                    </div>
+
+                    <div class="data-card">
+
+                        <span>PURPOSE</span>
+
+                        <strong id="modalPurpose">
+                            —
+                        </strong>
+
+                    </div>
+
+                    <div class="data-card">
+
+                        <span>MASS</span>
+
+                        <strong id="modalMass">
+                            —
+                        </strong>
+
+                    </div>
+
+                    <div class="data-card">
+
+                        <span>LATITUDE</span>
+
+                        <strong id="modalLatitude">
+                            —
+                        </strong>
+
+                    </div>
+
+                    <div class="data-card">
+
+                        <span>LONGITUDE</span>
+
+                        <strong id="modalLongitude">
+                            —
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="modal-section">
+
+                    <p class="modal-section-label">
+                        THE SCIENCE
+                    </p>
+
+                    <p id="modalScience">
+                        —
+                    </p>
+
+                </div>
+
+
+                <div class="modal-section">
+
+                    <p class="modal-section-label">
+                        CONTRIBUTION TO HUMANITY
+                    </p>
+
+                    <p id="modalContribution">
+                        —
+                    </p>
+
+                </div>
+
+
+                <div class="modal-section">
+
+                    <p class="modal-section-label">
+                        NASA DATA & RESOURCES
+                    </p>
+
+                    <div
+                        class="resource-list"
+                        id="modalResources"
+                    >
+                        <!-- JavaScript inserts resources here -->
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         AUDIO
+
+         IMPORTANT:
+
+         Put your own audio files in /audio/
+
+         Then make the filenames below match your files.
+         ========================================================= -->
+
+    <audio
+        id="busEngineAudio"
+        src="audio/bus-engine.mp3"
+        preload="auto"
+        loop
+    ></audio>
+
+    <audio
+        id="eagleAudio"
+        src="audio/eagle-story.mp3"
+        preload="auto"
+    ></audio>
+
+    <audio
+        id="lunarRoverAudio"
+        src="audio/lunar-rover-story.mp3"
+        preload="auto"
+    ></audio>
+
+    <audio
+        id="alsepAudio"
+        src="audio/alsep-story.mp3"
+        preload="auto"
+    ></audio>
+
+    <audio
+        id="opportunityAudio"
+        src="audio/opportunity-story.mp3"
+        preload="auto"
+    ></audio>
+
+    <audio
+        id="spiritAudio"
+        src="audio/spirit-story.mp3"
+        preload="auto"
+    ></audio>
+
+    <audio
+        id="insightAudio"
+        src="audio/insight-story.mp3"
+        preload="auto"
+    ></audio>
+
+    <audio
+        id="endingAudio"
+        src="audio/ending.mp3"
+        preload="auto"
+    ></audio>
+
+
+    <!-- =========================================================
+         JAVASCRIPT LIBRARIES
+         ========================================================= -->
+
+    <!-- GSAP -->
+    <script
+        src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"
+    ></script>
+
+    <!-- ScrollTrigger -->
+    <script
+        src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"
+    ></script>
+
+    <!-- Lenis -->
+    <script
+        src="https://cdn.jsdelivr.net/npm/lenis@1.3.11/dist/lenis.min.js"
+    ></script>
+
+
+    <!-- YOUR JAVASCRIPT -->
+    <script src="script.js"></script>
+
+</body>
+
+</html>
