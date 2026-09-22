@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="BUSSY 67! — an interactive cinematic journey through abandoned NASA hardware on the Moon and Mars.">
+  <title>BUSSY 67! — Abandoned but Not Forgotten</title>
+
+  <!--
+    ============================================================
+    CDN LIBRARIES
+    ------------------------------------------------------------
+    GSAP + ScrollTrigger = cinematic animation and scroll scenes
+    Lenis = smooth scrolling
+    No npm installation is required.
+    ============================================================
+  -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.15.0/gsap.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.15.0/ScrollTrigger.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.min.js" defer></script>
+
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+
+<body>
+  <!--
+    ============================================================
+    PROJECT SHELL
+    The scroll itself is the navigation. There is intentionally
+    no traditional navigation bar.
+    ============================================================
+  -->
+
+  <div class="scroll-progress" aria-hidden="true">
+    <span id="progressBar"></span>
+  </div>
+
+  <div class="story-label" aria-hidden="true">
+    <span id="currentChapter">01</span>
+    <span class="story-label-divider"></span>
+    <span id="currentLocation">EARTH</span>
+  </div>
+
+  <main id="story">
+
+    <!-- ======================================================
+         SCENE 01 — LANDING PAGE
+         ====================================================== -->
+    <section class="story-scene scene-landing" id="scene-01"
+      data-scene="1"
+      data-location="EARTH"
+      aria-labelledby="scene-01-title">
+
+      <div class="background-layer background-base"></div>
+      <div class="stars-layer stars-a" aria-hidden="true"></div>
+      <div class="stars-layer stars-b" aria-hidden="true"></div>
+      <div class="dust-layer" aria-hidden="true"></div>
+
+      <div class="scene-content landing-content">
+        <div class="eyebrow reveal-item">NASA SPACE APPS • ABANDONED BUT NOT FORGOTTEN</div>
+        <h1 id="scene-01-title" class="hero-title">BUSSY <span>67!</span></h1>
+        <p class="hero-subtitle">
+          Your school bus is leaving Earth.<br>
+          Forgotten explorers are waiting beyond the sky.
+        </p>
+
+        <!--
+          ======================================================
+          START BUTTON
+          This is the user's first interaction.
+          It unlocks the audio system before the story begins.
+          ======================================================
+        -->
+        <button class="primary-button start-button" id="startButton" type="button">
+          <span>LET'S START EXPLORING</span>
+          <span class="button-arrow" aria-hidden="true">→</span>
+        </button>
+
+        <div class="landing-note">Scroll to travel • Click to discover • Listen to their stories</div>
+
+        <!--
+          CHANGE THIS:
+          Replace assets/bus.png with your finished school-bus artwork.
+        -->
+        <div class="landing-bus bus-vehicle" data-image-fallback="bus">
+          <img
+            src="assets/bus.png"
+            alt="Cute cartoon school bus ready for a journey through space"
+            loading="eager"
+            onerror="showImageFallback(this)">
+          <div class="character-fallback bus-fallback" aria-hidden="true">🚌</div>
+        </div>
+      </div>
+
+      <div class="scroll-cue" aria-hidden="true">
+        <span>SCROLL</span>
+        <span class="scroll-line"></span>
+      </div>
+    </section>
+
+
+    <!-- ======================================================
+         SCENE 02 — TRAVELLING TO THE MOON
+         ====================================================== -->
+    <section class="story-scene scene-space" id="scene-02"
+      data-scene="2"
+      data-location="SPACE • MOONBOUND"
+      aria-labelledby="scene-02-title">
+
+      <div class="background-layer background-base"></div>
+      <div class="nebula-layer" aria-hidden="true"></div>
+      <div class="stars-layer stars-a" aria-hidden="true"></div>
+      <div class="stars-layer stars-b" aria-hidden="true"></div>
+
+      <div class="celestial-object earth-orb" aria-hidden="true"></div>
+      <div class="celestial-object moon-orb" aria-hidden="true"></div>
+
+      <!--
+        CHANGE THIS:
+        Replace assets/bus.png with your actual bus artwork.
+      -->
+      <div class="travel-bus" data-travel-bus>
+        <img
+          src="assets/bus.png"
+          alt="School bus traveling through space toward the Moon"
+          loading="lazy"
+          onerror="showImageFallback(this)">
+        <div class="character-fallback bus-fallback" aria-hidden="true">🚌</div>
+      </div>
+
+      <div class="scene-content travel-content">
+        <div class="eyebrow">CHAPTER 02 • DEPARTURE</div>
+        <h2 id="scene-02-title" class="scene-title">TRAVELLING<br><span>TO THE MOON</span></h2>
+        <p class="scene-copy">
+          Buckle up. Our first stop is a world where footprints last for millions of years.
+        </p>
+        <div class="travel-status">
+          <span class="status-dot"></span>
+          <span>ENGINE ONLINE</span>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ======================================================
+         SCENE 03 — APOLLO 11 EAGLE DESCENT STAGE
+         ====================================================== -->
+    <section class="story-scene scene-moon object-scene" id="scene-03"
+      data-scene="3"
+      data-location="MOON"
+      data-object-key="eagle"
+      aria-labelledby="scene-03-title">
+
+      <div class="background-layer background-base"></div>
+      <div class="terrain-glow" aria-hidden="true"></div>
+      <div class="particle-field" aria-hidden="true"></div>
+
+      <div class="scene-content object-content">
+        <div class="object-copy">
+          <div class="eyebrow">THE MOON • CHAPTER 03</div>
+          <h2 id="scene-03-title" class="scene-title">APOLLO 11<br><span>EAGLE DESCENT STAGE</span></h2>
+          <p class="scene-copy object-tagline">A pioneer that opened the door.</p>
+
+          <button class="secondary-button read-about-button" type="button"
+            data-open-object="eagle">
+            READ ABOUT ME <span aria-hidden="true">↗</span>
+          </button>
+        </div>
+
+        <div class="character-stage">
+          <!-- CHANGE CHARACTER IMAGE HERE -->
+          <div class="character-wrap" data-character-key="eagle" data-float="0.9">
+            <img
+              class="character-image"
+              src="assets/eagle-cartoon.png"
+              alt="Cartoon Apollo 11 Eagle descent stage character"
+              loading="lazy"
+              onerror="showImageFallback(this)">
+            <div class="character-fallback">EAGLE<br><small>CARTOON PLACEHOLDER</small></div>
+          </div>
+          <div class="character-shadow" aria-hidden="true"></div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ======================================================
+         SCENE 04 — APOLLO LUNAR ROVING VEHICLE
+         ====================================================== -->
+    <section class="story-scene scene-moon object-scene" id="scene-04"
+      data-scene="4"
+      data-location="MOON"
+      data-object-key="lrv"
+      aria-labelledby="scene-04-title">
+
+      <div class="background-layer background-base"></div>
+      <div class="terrain-glow" aria-hidden="true"></div>
+      <div class="particle-field lunar-particles" aria-hidden="true"></div>
+
+      <div class="scene-content object-content object-content-reverse">
+        <div class="character-stage">
+          <!-- CHANGE CHARACTER IMAGE HERE -->
+          <div class="character-wrap character-lrv" data-character-key="lrv" data-float="1.1">
+            <img
+              class="character-image"
+              src="assets/lrv-cartoon.png"
+              alt="Cartoon Apollo Lunar Roving Vehicle character"
+              loading="lazy"
+              onerror="showImageFallback(this)">
+            <div class="character-fallback">LRV<br><small>CARTOON PLACEHOLDER</small></div>
+          </div>
+          <div class="character-shadow" aria-hidden="true"></div>
+        </div>
+
+        <div class="object-copy">
+          <div class="eyebrow">THE MOON • CHAPTER 04</div>
+          <h2 id="scene-04-title" class="scene-title">APOLLO<br><span>LUNAR ROVING VEHICLE</span></h2>
+          <p class="scene-copy object-tagline">Four wheels. One giant playground.</p>
+
+          <button class="secondary-button read-about-button" type="button"
+            data-open-object="lrv">
+            READ ABOUT ME <span aria-hidden="true">↗</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ======================================================
+         SCENE 05 — ALSEP SCIENCE STATIONS
+         ====================================================== -->
+    <section class="story-scene scene-moon object-scene" id="scene-05"
+      data-scene="5"
+      data-location="MOON"
+      data-object-key="alsep"
+      aria-labelledby="scene-05-title">
+
+      <div class="background-layer background-base"></div>
+      <div class="terrain-glow" aria-hidden="true"></div>
+      <div class="particle-field lunar-particles" aria-hidden="true"></div>
+
+      <div class="scene-content object-content">
+        <div class="object-copy">
+          <div class="eyebrow">THE MOON • CHAPTER 05</div>
+          <h2 id="scene-05-title" class="scene-title">ALSEP<br><span>SCIENCE STATIONS</span></h2>
+          <p class="scene-copy object-tagline">The Moon's quiet science team.</p>
+
+          <button class="secondary-button read-about-button" type="button"
+            data-open-object="alsep">
+            READ ABOUT ME <span aria-hidden="true">↗</span>
+          </button>
+        </div>
+
+        <div class="character-stage">
+          <!-- CHANGE CHARACTER IMAGE HERE -->
+          <div class="character-wrap character-alsep" data-character-key="alsep" data-float="0.75">
+            <img
+              class="character-image"
+              src="assets/alsep-cartoon.png"
+              alt="Cartoon Apollo Lunar Surface Experiments Package character"
+              loading="lazy"
+              onerror="showImageFallback(this)">
+            <div class="character-fallback">ALSEP<br><small>CARTOON PLACEHOLDER</small></div>
+          </div>
+          <div class="character-shadow" aria-hidden="true"></div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ======================================================
+         SCENE 06 — TRAVELLING TO MARS
+         ====================================================== -->
+    <section class="story-scene scene-space scene-space-mars" id="scene-06"
+      data-scene="6"
+      data-location="SPACE • MARSBOUND"
+      aria-labelledby="scene-06-title">
+
+      <div class="background-layer background-base"></div>
+      <div class="nebula-layer" aria-hidden="true"></div>
+      <div class="stars-layer stars-a" aria-hidden="true"></div>
+      <div class="stars-layer stars-b" aria-hidden="true"></div>
+
+      <div class="celestial-object moon-departure" aria-hidden="true"></div>
+      <div class="celestial-object mars-orb" aria-hidden="true"></div>
+
+      <div class="travel-bus" data-travel-bus data-bus-return="false">
+        <img
+          src="assets/bus.png"
+          alt="School bus traveling through space toward Mars"
+          loading="lazy"
+          onerror="showImageFallback(this)">
+        <div class="character-fallback bus-fallback" aria-hidden="true">🚌</div>
+      </div>
+
+      <div class="scene-content travel-content">
+        <div class="eyebrow">CHAPTER 06 • NEW HORIZON</div>
+        <h2 id="scene-06-title" class="scene-title">TRAVELLING<br><span>TO MARS</span></h2>
+        <p class="scene-copy">
+          The Moon is behind us. A red planet waits ahead, carrying stories written in dust.
+        </p>
+        <div class="travel-status">
+          <span class="status-dot"></span>
+          <span>DESTINATION: MARS</span>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ======================================================
+         SCENE 07 — OPPORTUNITY ROVER
+         ====================================================== -->
+    <section class="story-scene scene-mars object-scene" id="scene-07"
+      data-scene="7"
+      data-location="MARS"
+      data-object-key="opportunity"
+      aria-labelledby="scene-07-title">
+
+      <div class="background-layer background-base"></div>
+      <div class="mars-horizon" aria-hidden="true"></div>
+      <div class="particle-field mars-particles" aria-hidden="true"></div>
+
+      <div class="scene-content object-content object-content-reverse">
+        <div class="character-stage">
+          <!-- CHANGE CHARACTER IMAGE HERE -->
+          <div class="character-wrap character-opportunity" data-character-key="opportunity" data-float="1.05">
+            <img
+              class="character-image"
+              src="assets/opportunity-cartoon.png"
+              alt="Cartoon Opportunity rover character"
+              loading="lazy"
+              onerror="showImageFallback(this)">
+            <div class="character-fallback">OPPORTUNITY<br><small>CARTOON PLACEHOLDER</small></div>
+          </div>
+          <div class="character-shadow" aria-hidden="true"></div>
+        </div>
+
+        <div class="object-copy">
+          <div class="eyebrow">MARS • CHAPTER 07</div>
+          <h2 id="scene-07-title" class="scene-title">OPPORTUNITY<br><span>THE LITTLE ROVER THAT KEPT GOING</span></h2>
+          <p class="scene-copy object-tagline">Curious. Adventurous. Still remembered.</p>
+
+          <button class="secondary-button read-about-button" type="button"
+            data-open-object="opportunity">
+            READ ABOUT ME <span aria-hidden="true">↗</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ======================================================
+         SCENE 08 — SPIRIT ROVER
+         ====================================================== -->
+    <section class="story-scene scene-mars object-scene" id="scene-08"
+      data-scene="8"
+      data-location="MARS"
+      data-object-key="spirit"
+      aria-labelledby="scene-08-title">
+
+      <div class="background-layer background-base"></div>
+      <div class="mars-horizon" aria-hidden="true"></div>
+      <div class="particle-field mars-particles" aria-hidden="true"></div>
+
+      <div class="scene-content object-content">
+        <div class="object-copy">
+          <div class="eyebrow">MARS • CHAPTER 08</div>
+          <h2 id="scene-08-title" class="scene-title">SPIRIT<br><span>THE DETERMINED EXPLORER</span></h2>
+          <p class="scene-copy object-tagline">A quiet friend on a difficult world.</p>
+
+          <button class="secondary-button read-about-button" type="button"
+            data-open-object="spirit">
+            READ ABOUT ME <span aria-hidden="true">↗</span>
+          </button>
+        </div>
+
+        <div class="character-stage">
+          <!-- CHANGE CHARACTER IMAGE HERE -->
+          <div class="character-wrap character-spirit" data-character-key="spirit" data-float="0.9">
+            <img
+              class="character-image"
+              src="assets/spirit-cartoon.png"
+              alt="Cartoon Spirit rover character"
+              loading="lazy"
+              onerror="showImageFallback(this)">
+            <div class="character-fallback">SPIRIT<br><small>CARTOON PLACEHOLDER</small></div>
+          </div>
+          <div class="character-shadow" aria-hidden="true"></div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ======================================================
+         SCENE 09 — INSIGHT ROBOTIC ARM
+         ====================================================== -->
+    <section class="story-scene scene-mars object-scene" id="scene-09"
+      data-scene="9"
+      data-location="MARS"
+      data-object-key="insight"
+      aria-labelledby="scene-09-title">
+
+      <div class="background-layer background-base"></div>
+      <div class="mars-horizon" aria-hidden="true"></div>
+      <div class="particle-field mars-particles" aria-hidden="true"></div>
+
+      <div class="scene-content object-content object-content-reverse">
+        <div class="character-stage">
+          <!-- CHANGE CHARACTER IMAGE HERE -->
+          <div class="character-wrap character-insight" data-character-key="insight" data-float="0.65">
+            <img
+              class="character-image"
+              src="assets/insight-cartoon.png"
+              alt="Cartoon InSight lander and robotic arm character"
+              loading="lazy"
+              onerror="showImageFallback(this)">
+            <div class="character-fallback">INSIGHT<br><small>CARTOON PLACEHOLDER</small></div>
+          </div>
+          <div class="character-shadow" aria-hidden="true"></div>
+        </div>
+
+        <div class="object-copy">
+          <div class="eyebrow">MARS • CHAPTER 09</div>
+          <h2 id="scene-09-title" class="scene-title">INSIGHT<br><span>ROBOTIC ARM</span></h2>
+          <p class="scene-copy object-tagline">Calm hands, deep questions.</p>
+
+          <button class="secondary-button read-about-button" type="button"
+            data-open-object="insight">
+            READ ABOUT ME <span aria-hidden="true">↗</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ======================================================
+         SCENE 10 — RETURNING HOME
+         ====================================================== -->
+    <section class="story-scene scene-space scene-return" id="scene-10"
+      data-scene="10"
+      data-location="SPACE • HOMEBOUND"
+      aria-labelledby="scene-10-title">
+
+      <div class="background-layer background-base"></div>
+      <div class="nebula-layer" aria-hidden="true"></div>
+      <div class="stars-layer stars-a" aria-hidden="true"></div>
+      <div class="stars-layer stars-b" aria-hidden="true"></div>
+
+      <div class="celestial-object home-earth-orb" aria-hidden="true"></div>
+
+      <div class="travel-bus return-bus" data-travel-bus data-bus-return="true">
+        <img
+          src="assets/bus.png"
+          alt="School bus returning home through space"
+          loading="lazy"
+          onerror="showImageFallback(this)">
+        <div class="character-fallback bus-fallback" aria-hidden="true">🚌</div>
+      </div>
+
+      <div class="scene-content travel-content">
+        <div class="eyebrow">CHAPTER 10 • HOMEBOUND</div>
+        <h2 id="scene-10-title" class="scene-title">RETURNING<br><span>HOME</span></h2>
+        <p class="scene-copy">
+          The engines turn toward Earth. But the stories we've met are coming with us.
+        </p>
+        <div class="travel-status">
+          <span class="status-dot"></span>
+          <span>EARTH IN SIGHT</span>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ======================================================
+         SCENE 11 — SEE Y'ALL LATER
+         ====================================================== -->
+    <section class="story-scene scene-final" id="scene-11"
+      data-scene="11"
+      data-location="EARTH"
+      aria-labelledby="scene-11-title">
+
+      <div class="background-layer background-base"></div>
+      <div class="stars-layer stars-a" aria-hidden="true"></div>
+      <div class="dust-layer" aria-hidden="true"></div>
+
+      <div class="scene-content final-content">
+        <div class="eyebrow">END OF JOURNEY</div>
+        <h2 id="scene-11-title" class="final-title">SEE Y'ALL<br><span>LATER</span></h2>
+
+        <!--
+          CHANGE THIS:
+          Replace assets/bus.png with your final bus artwork.
+        -->
+        <div class="final-bus bus-vehicle" data-image-fallback="bus">
+          <img
+            src="assets/bus.png"
+            alt="Cute cartoon school bus saying goodbye after a journey through space"
+            loading="lazy"
+            onerror="showImageFallback(this)">
+          <div class="character-fallback bus-fallback" aria-hidden="true">🚌</div>
+        </div>
+
+        <p class="final-copy">
+          Some machines stop moving.<br>
+          Their stories don't.
+        </p>
+      </div>
+    </section>
+
+  </main>
+
+
+  <!-- ======================================================
+       INFORMATION MODAL
+       ONE reusable modal for all five object scenes.
+       ====================================================== -->
+  <div
+    class="info-modal"
+    id="infoModal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="modalTitle"
+    aria-hidden="true">
+
+    <div class="modal-backdrop" data-close-modal></div>
+
+    <div class="modal-panel" role="document">
+      <button
+        class="modal-close"
+        id="modalClose"
+        type="button"
+        aria-label="Close information portal">
+        ×
+      </button>
+
+      <div class="modal-grid">
+        <div class="modal-image-wrap">
+          <img
+            id="modalImage"
+            class="modal-image"
+            src=""
+            alt=""
+            onerror="showImageFallback(this)">
+          <div class="modal-image-fallback character-fallback" id="modalImageFallback">
+            NASA IMAGE PLACEHOLDER
+          </div>
+
+          <div class="modal-image-caption">REAL NASA OBJECT</div>
+        </div>
+
+        <div class="modal-copy">
+          <div class="eyebrow" id="modalSubtitle">NASA OBJECT</div>
+          <h2 id="modalTitle" class="modal-title">Object Name</h2>
+          <p id="modalIntro" class="modal-intro"></p>
+
+          <div class="facts-grid" id="modalFacts"></div>
+
+          <div class="science-block">
+            <h3>Scientific / Engineering Significance</h3>
+            <p id="modalScience"></p>
+          </div>
+
+          <div class="science-block">
+            <h3>Contribution to Humanity</h3>
+            <p id="modalContribution"></p>
+          </div>
+
+          <div class="science-block">
+            <h3>NASA Resources</h3>
+            <div id="modalResources" class="resource-list"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tiny status message for gracefully handling missing placeholder assets. -->
+  <div class="asset-notice" id="assetNotice" aria-live="polite"></div>
+</body>
+</html>
