@@ -41,16 +41,16 @@ const objects = {
     // ========================================================
     // CHANGE CHARACTER IMAGE HERE
     // Replace this local path with your own artwork.
-    // Example: assets/eagle-cartoon.png
+    // Example: assets/images/eagle-cartoon.png
     // ========================================================
-    characterImage: "assets/eagle-cartoon.png",
+    characterImage: "assets/images/eagle-cartoon.png",
 
     // ========================================================
     // CHANGE REAL NASA IMAGE HERE
     // Replace this with a verified local NASA image or URL.
     // Do NOT invent a NASA URL.
     // ========================================================
-    realImage: "assets/eagle-real.jpg",
+    realImage: "assets/images/eagle-real.jpg",
 
     // ========================================================
     // CHANGE NARRATION HERE
@@ -82,10 +82,10 @@ const objects = {
     intro: "The cartoon character represents the Apollo Lunar Roving Vehicle, remembered here through the science and exploration story you provide.",
 
     // CHANGE CHARACTER IMAGE HERE
-    characterImage: "assets/lrv-cartoon.png",
+    characterImage: "assets/images/lrv-cartoon.png",
 
     // CHANGE REAL NASA IMAGE HERE
-    realImage: "assets/lrv-real.jpg",
+    realImage: "assets/images/lrv-real.jpg",
 
     // CHANGE NARRATION HERE
     audio: "assets/audio/lrv-narration.mp3",
@@ -111,10 +111,10 @@ const objects = {
     intro: "The cartoon character represents the Apollo Lunar Surface Experiments Package / ALSEP science stations deployed on the Moon.",
 
     // CHANGE CHARACTER IMAGE HERE
-    characterImage: "assets/alsep-cartoon.png",
+    characterImage: "assets/images/alsep-cartoon.png",
 
     // CHANGE REAL NASA IMAGE HERE
-    realImage: "assets/alsep-real.jpg",
+    realImage: "assets/images/alsep-real.jpg",
 
     // CHANGE NARRATION HERE
     audio: "assets/audio/alsep-narration.mp3",
@@ -140,10 +140,10 @@ const objects = {
     intro: "The cartoon character represents NASA's Opportunity rover, remembered here as a curious explorer on another world.",
 
     // CHANGE CHARACTER IMAGE HERE
-    characterImage: "assets/opportunity-cartoon.png",
+    characterImage: "assets/images/opportunity-cartoon.png",
 
     // CHANGE REAL NASA IMAGE HERE
-    realImage: "assets/opportunity-real.jpg",
+    realImage: "assets/images/opportunity-real.jpg",
 
     // CHANGE NARRATION HERE
     audio: "assets/audio/opportunity-narration.mp3",
@@ -169,10 +169,10 @@ const objects = {
     intro: "The cartoon character represents NASA's Spirit rover, presented as a determined explorer whose scientific story you can reveal.",
 
     // CHANGE CHARACTER IMAGE HERE
-    characterImage: "assets/spirit-cartoon.png",
+    characterImage: "assets/images/spirit-cartoon.png",
 
     // CHANGE REAL NASA IMAGE HERE
-    realImage: "assets/spirit-real.jpg",
+    realImage: "assets/images/spirit-real.jpg",
 
     // CHANGE NARRATION HERE
     audio: "assets/audio/spirit-narration.mp3",
@@ -198,10 +198,10 @@ const objects = {
     intro: "The cartoon character represents the InSight lander / robotic arm story, focused on the scientific work performed on Mars.",
 
     // CHANGE CHARACTER IMAGE HERE
-    characterImage: "assets/insight-cartoon.png",
+    characterImage: "assets/images/insight-cartoon.png",
 
     // CHANGE REAL NASA IMAGE HERE
-    realImage: "assets/insight-real.jpg",
+    realImage: "assets/images/insight-real.jpg",
 
     // CHANGE NARRATION HERE
     audio: "assets/audio/insight-narration.mp3",
@@ -398,7 +398,7 @@ const AudioManager = {
     this.currentNarrationPath = null;
   },
 
-  async playAmbient(type, path, volume = 0.22) {
+  async playAmbient(type, path, volume = 0.08) {
     if (!isAudioUnlocked || !path) return;
 
     if (this.ambientType === type && this.ambient && !this.ambient.paused) return;
@@ -565,9 +565,9 @@ function handleSceneEnter(sceneElement) {
     const isMars = sceneElement.classList.contains("scene-mars");
 
     if (isMars) {
-      AudioManager.playAmbient("mars", audioPaths.marsAmbient, 0.16);
+      AudioManager.playAmbient("mars", audioPaths.marsAmbient, 0.08);
     } else {
-      AudioManager.playAmbient("moon", audioPaths.moonAmbient, 0.16);
+      AudioManager.playAmbient("moon", audioPaths.moonAmbient, 0.08);
     }
 
     return;
