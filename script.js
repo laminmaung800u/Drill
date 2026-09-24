@@ -233,10 +233,6 @@ const objects = {
 const audioPaths = {
   // ADD YOUR AUDIO HERE
   busEngine: "assets/audio/bus-engine.mp3",
-
-  // ADD YOUR AUDIO HERE
-  moonAmbient: "assets/audio/moon-ambience.mp3",
-
   // ADD YOUR AUDIO HERE
   marsAmbient: "assets/audio/mars-ambience.mp3",
 
@@ -548,64 +544,68 @@ function handleSceneEnter(sceneElement) {
   const objectKey = getObjectKeyFromScene(sceneElement);
   activeObjectKey = objectKey;
 
+  const sceneId = sceneElement.id;
+
+  /*
+    Audio is controlled by the chapter itself.
+
+    Chapter 2, 6, 10:
+      - Bus engine only.
+
+    Chapters 3, 4, 5:
+      - Object narration only.
+      - NO moon ambience.
+
+    Chapters 7, 8, 9:
+      - Object narration + quiet Mars ambience.
+
+    Chapter 11:
+      - Final narration only.
+  */
+
+  // Stop audio layers from the previous chapter before starting
+  // the audio appropriate for the new chapter.
+  AudioManager.stopNarration();
+  AudioManager.stopAmbient();
+  AudioManager.stopEngine();
+
   if (objectKey) {
     const objectData = objects[objectKey];
 
     if (objectData) {
-      /*
-        Narration starts automatically only after the audio system
-        has been unlocked by the START button.
-      */
       AudioManager.playNarration(objectData.audio);
     }
 
-    /*
-      Lunar and Martian ambient sound remains underneath narration.
-    */
-    const isMars = sceneElement.classList.contains("scene-mars");
+    const isMars = sceneId === "scene-07" ||
+                   sceneId === "scene-08" ||
+                   sceneId === "scene-09";
 
     if (isMars) {
       AudioManager.playAmbient("mars", audioPaths.marsAmbient, 0.08);
-    } else {
-      AudioManager.playAmbient("moon", audioPaths.moonAmbient, 0.08);
     }
 
     return;
   }
 
-  /*
-    Travel scenes:
-    stop object narration, run engine, and use deep-space ambient
-    by keeping only the engine layer active.
-  */
-  AudioManager.stopNarration();
-
-  const sceneId = sceneElement.id;
-
-  if (sceneId === "scene-02" || sceneId === "scene-06") {
+  // Bus engine plays ONLY on Chapters 2, 6, and 10.
+  if (
+    sceneId === "scene-02" ||
+    sceneId === "scene-06" ||
+    sceneId === "scene-10"
+  ) {
     AudioManager.playEngine();
-    AudioManager.stopAmbient();
-    activeObjectKey = null;
-    return;
-  }
-
-  if (sceneId === "scene-10") {
-    AudioManager.stopEngine();
-    AudioManager.playAmbient("homecoming", audioPaths.returnHome, 0.2);
     activeObjectKey = null;
     return;
   }
 
   if (sceneId === "scene-11") {
-    AudioManager.stopEngine();
-    AudioManager.stopAmbient();
+    activeObjectKey = null;
 
     if (isAudioUnlocked && audioPaths.finalNarration) {
       AudioManager.playNarration(audioPaths.finalNarration);
     }
   }
 }
-
 
 function handleSceneLeave(sceneElement) {
   if (!sceneElement) return;
@@ -1138,13 +1138,11 @@ function setupButtonEvents() {
   /*
     START BUTTON:
     1. Unlock audio.
-    2. Start appropriate sound.
-    3. Scroll to Scene 02.
+    2. Scroll to Chapter 2.
+    3. Chapter 2's scene-enter handler starts the bus engine.
   */
-  elements.startButton.addEventListener("click", async () => {
+  elements.startButton.addEventListener("click", () => {
     AudioManager.unlock();
-
-    await AudioManager.playEngine();
 
     const sceneTwo = document.getElementById("scene-02");
     scrollToScene(sceneTwo);
@@ -1203,17 +1201,31 @@ function setupPageVisibilityAudio() {
 
     if (!isAudioUnlocked) return;
 
-    if (AudioManager.ambient && AudioManager.ambient.paused) {
-      AudioManager.ambient.play().catch(() => {});
-    }
+    const isEngineChapter =
+      activeSceneNumber === 2 ||
+      activeSceneNumber === 6 ||
+      activeSceneNumber === 10;
 
-    if (AudioManager.engine && AudioManager.engine.paused) {
+    const isMarsChapter =
+      activeSceneNumber === 7 ||
+      activeSceneNumber === 8 ||
+      activeSceneNumber === 9;
+
+    if (isEngineChapter && AudioManager.engine && AudioManager.engine.paused) {
       AudioManager.engine.play().catch(() => {});
     }
 
-    /* Narration resumes only when it still belongs to the current
-       object and the visitor has not navigated to another scene. */
-    if (AudioManager.narration && AudioManager.narration.paused && activeObjectKey) {
+    if (isMarsChapter && AudioManager.ambient && AudioManager.ambient.paused) {
+      AudioManager.ambient.play().catch(() => {});
+    }
+
+    /* Narration resumes only for the currently active object or
+       final narration scene. */
+    if (
+      AudioManager.narration &&
+      AudioManager.narration.paused &&
+      (activeObjectKey || activeSceneNumber === 11)
+    ) {
       AudioManager.narration.play().catch(() => {});
     }
   });
