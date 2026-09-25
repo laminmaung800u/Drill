@@ -495,6 +495,44 @@ function initializeLenis() {
   lenis.on("scroll", ScrollTrigger.update);
 }
 
+function setupModalWheelIsolation() {
+  /*
+    The main story uses Lenis for smooth scrolling. Lenis can
+    otherwise see the mouse wheel even while the information
+    portal is open. The portal is therefore explicitly marked
+    with data-lenis-prevent in the HTML above.
+
+    This wheel listener is a second safety layer: while the
+    portal is open, wheel events are kept inside the portal
+    instead of being allowed to reach the page behind it.
+  */
+  if (!elements.modalPanel) return;
+
+  elements.modalPanel.addEventListener("wheel", (event) => {
+    if (!isModalOpen) return;
+
+    const panel = elements.modalPanel;
+    const canScroll = panel.scrollHeight > panel.clientHeight;
+
+    if (!canScroll) {
+      event.preventDefault();
+      return;
+    }
+
+    const atTop = panel.scrollTop <= 0;
+    const atBottom =
+      Math.ceil(panel.scrollTop + panel.clientHeight) >= panel.scrollHeight;
+
+    /*
+      Stop scroll chaining at the portal's boundaries. This keeps
+      the main Bussy 67 page behind the portal completely still.
+    */
+    if ((event.deltaY < 0 && atTop) || (event.deltaY > 0 && atBottom)) {
+      event.preventDefault();
+    }
+  }, { passive: false });
+}
+
 
 /* ============================================================
    5. SCENE MANAGEMENT
@@ -1323,6 +1361,7 @@ function initialize() {
   }
 
   initializeLenis();
+  setupModalWheelIsolation();
   setupModalImageFallback();
   setupButtonEvents();
   setupResponsiveBehavior();
