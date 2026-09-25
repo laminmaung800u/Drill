@@ -60,20 +60,20 @@ const objects = {
 
     mission: "Apollo 11",
     landingYear: "1969",
-    purpose: "Powered lunar landing, surface operations base, and launch platform for the Ascent Stage",
-    location: "Mare Tranquillitatis (Sea of Tranquility), Moon",
-    latitude: "0° 41′ 15″ N (≈ 0.674° N)",
-    longitude: "23° 26′ E (≈ 23.473° E)",
-    mass: "≈ 22,667 kg",
-    instruments: "TV camera on MESA; EASEP (Passive Seismic Experiment Package + Laser Ranging Retro-Reflector); Solar Wind Collector",
-    science: "First human lunar landing and EVA; deployment of seismic, laser-ranging, and solar-wind experiments; collection of 21.55 kg of lunar samples.",
-    contribution: "Proved crewed land-and-return architecture; enabled first lunar seismic and laser-ranging data; provided solar-wind samples and a permanent surface base (the Descent Stage) at Tranquility Base.",
+    purpose: "Powered landing and ascending",
+    location: "Mare Tranquillitatis, Moon",
+    latitude: "0° 41′ 15″ N",
+    longitude: "23° 26′ E",
+    mass: "22,667 kg",
+    instruments: "TV camera on MESA",
+    science: "First human lunar landing",
+    contribution: "Proved crewed land-and-return architecture",
 
     // ========================================================
     // ADD NASA RESOURCE URL HERE
     // Use only verified official resources.
     // ========================================================
-    resources: [[2026 NASA RESOURCE — INSERT WHEN AVAILABLE]]
+    resources: ["[2026 NASA RESOURCE — INSERT WHEN AVAILABLE]"]
   },
 
   lrv: {
