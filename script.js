@@ -73,7 +73,7 @@ const objects = {
     // ADD NASA RESOURCE URL HERE
     // Use only verified official resources.
     // ========================================================
-    resources: ["https://www.nasa.gov/missions/apollo/apollo-11/apollo-11-mission-overview/"]
+    resources: [[2026 NASA RESOURCE — INSERT WHEN AVAILABLE]]
   },
 
   lrv: {
