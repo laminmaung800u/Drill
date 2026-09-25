@@ -58,22 +58,22 @@ const objects = {
     // ========================================================
     audio: "assets/audio/eagle-narration.mp3",
 
-    mission: "[NASA DATA TO BE ADDED]",
-    landingYear: "[NASA DATA TO BE ADDED]",
-    purpose: "[NASA DATA TO BE ADDED]",
-    location: "[NASA DATA TO BE ADDED]",
-    latitude: "[NASA DATA TO BE ADDED]",
-    longitude: "[NASA DATA TO BE ADDED]",
-    mass: "[NASA DATA TO BE ADDED]",
-    instruments: "[NASA DATA TO BE ADDED]",
-    science: "[NASA DATA TO BE ADDED — VERIFY WITH NASA SOURCES]",
-    contribution: "[NASA DATA TO BE ADDED — VERIFY WITH NASA SOURCES]",
+    mission: "Apollo 11",
+    landingYear: "1969",
+    purpose: "Powered lunar landing, surface operations base, and launch platform for the Ascent Stage",
+    location: "Mare Tranquillitatis (Sea of Tranquility), Moon",
+    latitude: "0° 41′ 15″ N (≈ 0.674° N)",
+    longitude: "23° 26′ E (≈ 23.473° E)",
+    mass: "≈ 22,667 kg",
+    instruments: "TV camera on MESA; EASEP (Passive Seismic Experiment Package + Laser Ranging Retro-Reflector); Solar Wind Collector",
+    science: "First human lunar landing and EVA; deployment of seismic, laser-ranging, and solar-wind experiments; collection of 21.55 kg of lunar samples.",
+    contribution: "Proved crewed land-and-return architecture; enabled first lunar seismic and laser-ranging data; provided solar-wind samples and a permanent surface base (the Descent Stage) at Tranquility Base.",
 
     // ========================================================
     // ADD NASA RESOURCE URL HERE
     // Use only verified official resources.
     // ========================================================
-    resources: ["[2026 NASA RESOURCE — INSERT WHEN AVAILABLE]"]
+    resources: ["https://www.nasa.gov/missions/apollo/apollo-11/apollo-11-mission-overview/"]
   },
 
   lrv: {
