@@ -707,6 +707,9 @@ a:focus-visible {
   width: min(1180px, 100%);
   max-height: min(88svh, 900px);
   overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
   border: 1px solid rgba(255, 255, 255, 0.13);
   border-radius: 28px;
   background:
