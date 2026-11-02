@@ -1447,18 +1447,34 @@ if (document.readyState === "loading") {
 */
 
 
-/* Optional Three.js landing layer; isolated from the story/audio engine. */
+/* Shared Three.js world for the continuous Earth-to-Moon journey.
+   The existing audio manager and chapter audio triggers remain independent. */
 let scene3DController = null;
 async function initialize3DExperience() {
-  const landingScene=document.getElementById("scene-01");
-  const mount=document.getElementById("scene3d-root");
-  if(!landingScene||!mount||!window.gsap||!window.ScrollTrigger)return;
-  try{
-    const module=await import("./scene3d.js");
-    scene3DController=await module.createLandingExperience({mount,landingScene,gsap:window.gsap,ScrollTrigger:window.ScrollTrigger});
-    if(scene3DController)landingScene.classList.add("scene3d-ready");
-  }catch(error){
+  const landingScene = document.getElementById("scene-01");
+  const travelScene = document.getElementById("scene-02");
+  const mount = document.getElementById("scene3d-root");
+
+  if (!landingScene || !travelScene || !mount || !window.gsap || !window.ScrollTrigger) return;
+
+  try {
+    const module = await import("./scene3d.js");
+    scene3DController = await module.createStoryExperience({
+      mount,
+      landingScene,
+      travelScene,
+      gsap: window.gsap,
+      ScrollTrigger: window.ScrollTrigger
+    });
+
+    if (scene3DController) {
+      landingScene.classList.add("scene3d-ready");
+      travelScene.classList.add("scene3d-ready");
+      document.body.classList.add("story3d-ready");
+    }
+  } catch (error) {
     landingScene.classList.add("scene3d-failed");
-    console.warn("Chapter 1 3D unavailable; retaining the original 2D scene.",error);
+    travelScene.classList.add("scene3d-failed");
+    console.warn("Shared Chapter 1–2 3D experience unavailable; retaining the original 2D scenes.", error);
   }
 }
