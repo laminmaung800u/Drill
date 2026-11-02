@@ -574,6 +574,32 @@ function getObjectKeyFromScene(sceneElement) {
 }
 
 
+function resetEagleCaption() {
+  document.querySelectorAll("#eagleCaption [data-caption-line]").forEach((line) => {
+    line.classList.remove("is-revealed");
+  });
+}
+
+function connectEagleCaptionToNarration(audio) {
+  if (!audio) return;
+  const lines = Array.from(document.querySelectorAll("#eagleCaption [data-caption-line]"));
+  const revealAt = [0.02, 0.22, 0.46, 0.68, 0.82];
+  const updateCaption = () => {
+    if (!Number.isFinite(audio.duration) || audio.duration <= 0) return;
+    const progress = audio.currentTime / audio.duration;
+    lines.forEach((line, index) => {
+      if (progress >= revealAt[index]) line.classList.add("is-revealed");
+    });
+  };
+  audio.addEventListener("loadedmetadata", updateCaption);
+  audio.addEventListener("timeupdate", updateCaption);
+  audio.addEventListener("ended", () => {
+    lines.forEach((line) => line.classList.add("is-revealed"));
+  }, { once: true });
+  updateCaption();
+}
+
+
 function handleSceneEnter(sceneElement) {
   if (!sceneElement) return;
 
@@ -612,6 +638,10 @@ function handleSceneEnter(sceneElement) {
 
     if (objectData) {
       AudioManager.playNarration(objectData.audio);
+      if (objectKey === "eagle") {
+        resetEagleCaption();
+        connectEagleCaptionToNarration(AudioManager.narration);
+      }
     }
 
     const isMars = sceneId === "scene-07" ||
@@ -1453,9 +1483,10 @@ let scene3DController = null;
 async function initialize3DExperience() {
   const landingScene = document.getElementById("scene-01");
   const travelScene = document.getElementById("scene-02");
+  const surfaceScene = document.getElementById("scene-03");
   const mount = document.getElementById("scene3d-root");
 
-  if (!landingScene || !travelScene || !mount || !window.gsap || !window.ScrollTrigger) return;
+  if (!landingScene || !travelScene || !surfaceScene || !mount || !window.gsap || !window.ScrollTrigger) return;
 
   try {
     const module = await import("./scene3d.js");
@@ -1463,6 +1494,7 @@ async function initialize3DExperience() {
       mount,
       landingScene,
       travelScene,
+      surfaceScene,
       gsap: window.gsap,
       ScrollTrigger: window.ScrollTrigger
     });
@@ -1470,12 +1502,14 @@ async function initialize3DExperience() {
     if (scene3DController) {
       landingScene.classList.add("scene3d-ready");
       travelScene.classList.add("scene3d-ready");
+      surfaceScene.classList.add("scene3d-ready");
       document.body.classList.add("story3d-ready");
     }
   } catch (error) {
     landingScene.classList.add("scene3d-failed");
     travelScene.classList.add("scene3d-failed");
+    surfaceScene.classList.add("scene3d-failed");
     document.body.classList.add("story3d-failed");
-    console.warn("Shared Chapter 1–2 3D experience unavailable; retaining the original 2D scenes.", error);
+    console.warn("Shared Chapter 1–3 3D experience unavailable; retaining the original 2D scenes.", error);
   }
 }
