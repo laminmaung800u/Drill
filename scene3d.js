@@ -64,7 +64,7 @@ export async function createStoryExperience({mount,landingScene,travelScene,gsap
  const fallbackMoonMap=new THREE.CanvasTexture(moonCanvas);
  fallbackMoonMap.colorSpace=THREE.SRGBColorSpace;
  fallbackMoonMap.anisotropy=Math.min(renderer.capabilities.getMaxAnisotropy(),4);
- const moonMaterial=new THREE.MeshStandardMaterial({map:fallbackMoonMap,roughness:1,metalness:0});
+ const moonMaterial=new THREE.MeshStandardMaterial({map:fallbackMoonMap,bumpMap:fallbackMoonMap,bumpScale:.035,roughness:1,metalness:0});
  const moonGroup=new THREE.Group();
  moonGroup.position.set(mobile?1.0:4.8,mobile?1.35:.45,-2.55);
  moonGroup.scale.setScalar(.075);
@@ -73,13 +73,28 @@ export async function createStoryExperience({mount,landingScene,travelScene,gsap
  moonGroup.add(moon);
  const moonTextureUrl="https://svs.gsfc.nasa.gov/vis/a000000/a004700/a004720/lroc_color_2k.jpg";
  const moonLoader=new THREE.TextureLoader();moonLoader.setCrossOrigin("anonymous");
+ const releaseFallbackMoonMap=()=>{
+   if(moonMaterial.map!==fallbackMoonMap&&moonMaterial.bumpMap!==fallbackMoonMap)fallbackMoonMap.dispose();
+ };
  moonLoader.load(moonTextureUrl,texture=>{
    if(disposed){texture.dispose();return;}
    texture.colorSpace=THREE.SRGBColorSpace;
    texture.anisotropy=Math.min(renderer.capabilities.getMaxAnisotropy(),4);
    moonMaterial.map=texture;
    moonMaterial.needsUpdate=true;
+   releaseFallbackMoonMap();
  },undefined,()=>{ /* The procedural crater texture remains as a graceful offline fallback. */ });
+ // NASA LOLA elevation map adds genuine crater and terrain relief through bump mapping.
+ const heightLoader=new THREE.TextureLoader();heightLoader.setCrossOrigin("anonymous");
+ heightLoader.load("https://svs.gsfc.nasa.gov/vis/a000000/a004700/a004720/ldem_3_8bit.jpg",texture=>{
+   if(disposed){texture.dispose();return;}
+   texture.colorSpace=THREE.NoColorSpace;
+   texture.anisotropy=Math.min(renderer.capabilities.getMaxAnisotropy(),4);
+   moonMaterial.bumpMap=texture;
+   moonMaterial.bumpScale=.045;
+   moonMaterial.needsUpdate=true;
+   releaseFallbackMoonMap();
+ },undefined,()=>{ /* Keep the color map and its subtle procedural relief if height data is unavailable. */ });
 
 
  const count=lowPower?420:mobile?650:1050,positions=new Float32Array(count*3);
