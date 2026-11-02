@@ -1123,5 +1123,7 @@ body.story3d-ready #scene-02 .celestial-object{display:none!important}
 .scene3d-root canvas{display:block;width:100%;height:100%}
 .scene-landing.scene-landing.scene3d-ready .landing-bus{visibility:hidden!important}
 .scene-space.scene3d-ready [data-travel-bus]{visibility:hidden!important}
-.scene-landing.scene3d-failed .scene3d-root{display:none}
+body.story3d-failed #scene3d-root{display:none}
+.lunar-data-credit{position:absolute;right:clamp(16px,3vw,40px);bottom:15px;z-index:6;max-width:70%;font-size:8px;line-height:1.5;letter-spacing:.12em;text-align:right;color:rgba(230,232,238,.48);pointer-events:none}
+@media(max-width:620px){.lunar-data-credit{right:14px;bottom:10px;font-size:7px;max-width:82%}}
 @media(prefers-reduced-motion:reduce){.scene3d-root{transition:none}}
