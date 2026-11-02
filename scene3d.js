@@ -42,7 +42,7 @@ export async function createLandingExperience({mount,landingScene,gsap,ScrollTri
  shapes.forEach(p=>{ctx.beginPath();p.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.closePath();ctx.fill();});
  const ice=ctx.createLinearGradient(0,0,0,65);ice.addColorStop(0,"rgba(225,242,255,.92)");ice.addColorStop(1,"rgba(225,242,255,0)");ctx.fillStyle=ice;ctx.fillRect(0,0,1024,65);
  const earthMap=new THREE.CanvasTexture(mapCanvas);earthMap.colorSpace=THREE.SRGBColorSpace;earthMap.anisotropy=Math.min(renderer.capabilities.getMaxAnisotropy(),4);
- const earthGroup=new THREE.Group();earthGroup.position.set(-3.25,-.25,-1.35);scene.add(earthGroup);
+ const earthGroup=new THREE.Group();earthGroup.position.set(mobile?-.75:-3.25,mobile?.72:-.25,mobile?-1.8:-1.35);earthGroup.scale.setScalar(mobile?.58:1);scene.add(earthGroup);
  const earth=new THREE.Mesh(new THREE.SphereGeometry(2.05,lowPower?40:64,lowPower?32:48),new THREE.MeshStandardMaterial({map:earthMap,roughness:.92,metalness:.02}));earthGroup.add(earth);
  earthGroup.add(new THREE.Mesh(new THREE.SphereGeometry(2.13,48,32),new THREE.MeshBasicMaterial({color:0x56aaff,transparent:true,opacity:.19,side:THREE.BackSide,blending:THREE.AdditiveBlending,depthWrite:false})));
  earthGroup.add(new THREE.Mesh(new THREE.SphereGeometry(2.17,48,32),new THREE.MeshBasicMaterial({color:0x9bdcff,transparent:true,opacity:.075,side:THREE.BackSide,depthWrite:false})));
@@ -56,7 +56,7 @@ export async function createLandingExperience({mount,landingScene,gsap,ScrollTri
  if(disposed){busTexture.dispose();renderer.dispose();return null;}
  busTexture.colorSpace=THREE.SRGBColorSpace;busTexture.anisotropy=Math.min(renderer.capabilities.getMaxAnisotropy(),4);
  const bus=new THREE.Mesh(new THREE.PlaneGeometry(3.05,1.9),new THREE.MeshBasicMaterial({map:busTexture,transparent:true,alphaTest:.025,side:THREE.DoubleSide,depthWrite:false}));
- bus.position.set(1.7,-1.35,1.25);bus.rotation.z=-.045;scene.add(bus);
+ bus.position.set(mobile?.35:1.7,mobile?-1.48:-1.35,mobile?.85:1.25);bus.scale.setScalar(mobile?.62:1);bus.rotation.z=-.045;scene.add(bus);
  const glow=new THREE.PointLight(0x4c9fff,18,12,2);glow.position.set(-1.6,1.8,3.5);scene.add(glow);
 
  const cameraTween=gsap.fromTo(camera.position,{z:8.6,x:0,y:0},{z:7.7,x:.22,y:.12,ease:"none",scrollTrigger:{trigger:landingScene,start:"top top",end:"bottom top",scrub:1.2}});
