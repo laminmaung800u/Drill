@@ -1396,6 +1396,9 @@ function initialize() {
     }
   );
 
+  /* Start optional 3D layer; failure preserves the original 2D scene. */
+  initialize3DExperience();
+
   /*
     Gentle floating motion for the school bus.
   */
@@ -1442,3 +1445,20 @@ if (document.readyState === "loading") {
   The most important editable data is near the top of this file.
   ============================================================
 */
+
+
+/* Optional Three.js landing layer; isolated from the story/audio engine. */
+let scene3DController = null;
+async function initialize3DExperience() {
+  const landingScene=document.getElementById("scene-01");
+  const mount=document.getElementById("scene3d-root");
+  if(!landingScene||!mount||!window.gsap||!window.ScrollTrigger)return;
+  try{
+    const module=await import("./scene3d.js");
+    scene3DController=await module.createLandingExperience({mount,landingScene,gsap:window.gsap,ScrollTrigger:window.ScrollTrigger});
+    if(scene3DController)landingScene.classList.add("scene3d-ready");
+  }catch(error){
+    landingScene.classList.add("scene3d-failed");
+    console.warn("Chapter 1 3D unavailable; retaining the original 2D scene.",error);
+  }
+}
