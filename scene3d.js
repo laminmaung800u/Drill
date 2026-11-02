@@ -260,21 +260,21 @@ export async function createStoryExperience({mount,landingScene,travelScene,gsap
    scrub:1.15,invalidateOnRefresh:true
  }});
  journey
-   .to(camera.position,{x:mobile?0:.18,y:mobile?.08:.1,z:7.75},0)
-   .to(earthGroup.position,{x:mobile?-4.1:-6.25,y:mobile?1.25:1.05},0)
-   .to(earthGroup.scale,{x:.22,y:.22,z:.22},0)
+   .to(camera.position,{x:mobile?0:.18,y:mobile?.08:.1,z:7.75,duration:1},0)
+   .to(earthGroup.position,{x:mobile?-4.1:-6.25,y:mobile?1.25:1.05,duration:.5},0)
+   .to(earthGroup.scale,{x:.22,y:.22,z:.22,duration:.5},0)
    // The Moon is still distant when Chapter 2 begins (timeline halfway).
-   .to(moonGroup.position,{x:mobile?.75:4.45,y:mobile?1.55:.5,z:-2.45},.5)
-   .to(moonGroup.scale,{x:.17,y:.17,z:.17},.5)
+   .to(moonGroup.position,{x:mobile?.75:4.45,y:mobile?1.55:.5,z:-2.45,duration:.1},.5)
+   .to(moonGroup.scale,{x:.17,y:.17,z:.17,duration:.1},.5)
    // It grows and moves toward the camera throughout the Moonbound chapter.
-   .to(moonGroup.position,{x:mobile?.1:2.65,y:mobile?1.25:.28,z:-1.75},1)
-   .to(moonGroup.scale,{x:mobile?1.12:1.34,y:mobile?1.12:1.34,z:mobile?1.12:1.34},1)
-   .to(bus.position,{x:mobile?.3:1.65,y:mobile?-1.22:-1.25,z:1.05},.5)
-   .to(bus.rotation,{y:-.27,z:-.065},.5)
-   .to(bus.position,{x:mobile?-.25:.2,y:mobile?-.72:-.76,z:.62},.72)
-   .to(bus.rotation,{y:-.43,z:.075},.72)
-   .to(bus.position,{x:mobile?.18:1.05,y:mobile?-1.18:-1.16,z:.9},.92)
-   .to(bus.rotation,{y:-.3,z:-.025},.92);
+   .to(moonGroup.position,{x:mobile?.1:2.65,y:mobile?1.25:.28,z:-1.75,duration:.4},.6)
+   .to(moonGroup.scale,{x:mobile?1.12:1.34,y:mobile?1.12:1.34,z:mobile?1.12:1.34,duration:.4},.6)
+   .to(bus.position,{x:mobile?.3:1.65,y:mobile?-1.22:-1.25,z:1.05,duration:.2},.5)
+   .to(bus.rotation,{y:-.27,z:-.065,duration:.2},.5)
+   .to(bus.position,{x:mobile?-.25:.2,y:mobile?-.72:-.76,z:.62,duration:.2},.7)
+   .to(bus.rotation,{y:-.43,z:.075,duration:.2},.7)
+   .to(bus.position,{x:mobile?.18:1.05,y:mobile?-1.18:-1.16,z:.9,duration:.1},.9)
+   .to(bus.rotation,{y:-.3,z:-.025,duration:.1},.9);
  let busFloat=null,earthSpin=null,moonSpin=null;
  if(!reduced){
    busFloat=gsap.to(bus.rotation,{x:.018,duration:2.7,ease:"sine.inOut",yoyo:true,repeat:-1});
