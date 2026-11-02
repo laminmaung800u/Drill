@@ -52,11 +52,95 @@ export async function createLandingExperience({mount,landingScene,gsap,ScrollTri
  const starGeometry=new THREE.BufferGeometry();starGeometry.setAttribute("position",new THREE.BufferAttribute(positions,3));
  const stars=new THREE.Points(starGeometry,new THREE.PointsMaterial({color:0xdceaff,size:.035,transparent:true,opacity:.88,depthWrite:false}));scene.add(stars);
 
- const busTexture=await new Promise((resolve,reject)=>new THREE.TextureLoader().load("assets/images/bus.png",resolve,undefined,reject));
- if(disposed){busTexture.dispose();renderer.dispose();return null;}
- busTexture.colorSpace=THREE.SRGBColorSpace;busTexture.anisotropy=Math.min(renderer.capabilities.getMaxAnisotropy(),4);
- const bus=new THREE.Mesh(new THREE.PlaneGeometry(3.05,1.9),new THREE.MeshBasicMaterial({map:busTexture,transparent:true,alphaTest:.025,side:THREE.DoubleSide,depthWrite:false}));
- bus.position.set(mobile?.35:1.7,mobile?-1.48:-1.35,mobile?.85:1.25);bus.scale.setScalar(mobile?.62:1);bus.rotation.z=-.045;scene.add(bus);
+ // Build BUSSY as a real low-poly 3D school bus from reusable Three.js meshes.
+ // This replaces the flat PNG plane; the original PNG remains untouched in assets.
+ const bus=new THREE.Group();
+ bus.position.set(mobile?.35:1.7,mobile?-1.48:-1.35,mobile?.85:1.25);
+ bus.scale.setScalar(mobile?.62:.94);
+ bus.rotation.y=-.34;
+ bus.rotation.z=-.035;
+ scene.add(bus);
+
+ const mat=(color,roughness=.72,metalness=.02)=>new THREE.MeshStandardMaterial({color,roughness,metalness});
+ const yellow=mat(0xffc928,.58),yellowLight=mat(0xffdc55,.55),yellowDark=mat(0xd99b12,.7);
+ const glass=mat(0x17344e,.28,.18),rubber=mat(0x111722,.94),hub=mat(0xb8c6d5,.38,.55);
+ const trim=mat(0x202a36,.72),white=mat(0xf5f3e8,.38),red=mat(0xe84b42,.45),blue=mat(0x65c9f2,.32,.12);
+
+ const makeBox=(parent,w,h,d,material,x,y,z,rx=0,ry=0,rz=0)=>{
+   const mesh=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material);
+   mesh.position.set(x,y,z);mesh.rotation.set(rx,ry,rz);parent.add(mesh);return mesh;
+ };
+ const bodyShape=new THREE.Shape();
+ bodyShape.moveTo(-1.62,-.53);
+ bodyShape.lineTo(1.22,-.53);
+ bodyShape.quadraticCurveTo(1.63,-.53,1.66,-.16);
+ bodyShape.lineTo(1.66,.34);
+ bodyShape.quadraticCurveTo(1.66,.66,1.34,.66);
+ bodyShape.lineTo(-1.34,.66);
+ bodyShape.quadraticCurveTo(-1.66,.66,-1.66,.34);
+ bodyShape.lineTo(-1.66,-.53);
+ bodyShape.closePath();
+ const bodyGeometry=new THREE.ExtrudeGeometry(bodyShape,{depth:1.18,bevelEnabled:true,bevelSegments:3,steps:1,bevelSize:.055,bevelThickness:.055,curveSegments:8});
+ bodyGeometry.translate(0,0,-.59);
+ const body=new THREE.Mesh(bodyGeometry,yellow);bus.add(body);
+
+ // Roof cap and lower chassis give the silhouette real depth.
+ makeBox(bus,2.72,.12,1.22,yellowLight,-.02,.63,0);
+ makeBox(bus,2.92,.18,1.12,trim,-.02,-.51,0);
+ makeBox(bus,2.95,.12,1.2,yellowDark,-.02,-.36,0);
+
+ // Large side windows, with individual frames and central pillars.
+ for(const side of [-1,1]){
+   const z=side*.603;
+   for(let i=0;i<4;i++){
+     const x=-1.08+i*.59;
+     makeBox(bus,.49,.39,.035,trim,x,.28,z);
+     makeBox(bus,.425,.325,.025,glass,x,.29,z+side*.022);
+     makeBox(bus,.035,.34,.035,yellowLight,x-.255,.29,z+side*.025);
+     makeBox(bus,.035,.34,.035,yellowLight,x+.255,.29,z+side*.025);
+   }
+   // Side emergency door and its small window.
+   makeBox(bus,.34,.72,.04,yellowDark,1.18,.02,z);
+   makeBox(bus,.25,.32,.035,glass,1.18,.28,z+side*.025);
+   makeBox(bus,2.7,.095,.035,yellowDark,-.02,-.17,z+side*.025);
+   makeBox(bus,2.68,.035,.04,trim,-.02,-.25,z+side*.03);
+ }
+
+ // Front windshield, split into two panes; facing the bus's +X direction.
+ makeBox(bus,.055,.55,.94,trim,1.57,.27,0,0,0,-.12);
+ makeBox(bus,.045,.46,.40,glass,1.612,.29,-.235,0,0,-.12);
+ makeBox(bus,.045,.46,.40,glass,1.612,.29,.235,0,0,-.12);
+ makeBox(bus,.08,.08,1.02,yellowLight,1.57,.59,0,0,0,-.12);
+
+ // Friendly front bumper, grille and bright headlights.
+ makeBox(bus,.22,.17,1.25,trim,1.68,-.39,0);
+ makeBox(bus,.045,.22,.42,hub,1.80,-.20,0);
+ for(const z of [-.43,.43]){
+   const lamp=new THREE.Mesh(new THREE.SphereGeometry(.105,16,12),white);
+   lamp.position.set(1.72,-.12,z);bus.add(lamp);
+   const lens=new THREE.Mesh(new THREE.SphereGeometry(.055,12,8),blue);
+   lens.position.set(1.79,-.12,z);bus.add(lens);
+ }
+ makeBox(bus,.06,.12,.48,red,-1.68,-.22,0);
+
+ // Four chunky tires, with metallic hubs on both sides.
+ for(const x of [-1.03,1.03]){
+   for(const side of [-1,1]){
+     const tire=new THREE.Mesh(new THREE.CylinderGeometry(.34,.34,.19,24),rubber);
+     tire.rotation.x=Math.PI/2;tire.position.set(x,-.48,side*.62);bus.add(tire);
+     const wheelHub=new THREE.Mesh(new THREE.CylinderGeometry(.19,.19,.205,20),hub);
+     wheelHub.rotation.x=Math.PI/2;wheelHub.position.set(x,-.48,side*.62);bus.add(wheelHub);
+     const center=new THREE.Mesh(new THREE.CylinderGeometry(.075,.075,.215,16),trim);
+     center.rotation.x=Math.PI/2;center.position.set(x,-.48,side*.62);bus.add(center);
+   }
+ }
+ // Roof lights and a small destination panel add the familiar school-bus details.
+ for(const z of [-.43,0,.43]){
+   const marker=new THREE.Mesh(new THREE.SphereGeometry(.055,12,8),red);
+   marker.position.set(-1.32,.72,z);bus.add(marker);
+ }
+ makeBox(bus,.52,.15,.035,trim,-.9,.78,.62);
+ makeBox(bus,.39,.075,.02,white,-.9,.78,.645);
  const glow=new THREE.PointLight(0x4c9fff,18,12,2);glow.position.set(-1.6,1.8,3.5);scene.add(glow);
 
  const cameraTween=gsap.fromTo(camera.position,{z:8.6,x:0,y:0},{z:7.7,x:.22,y:.12,ease:"none",scrollTrigger:{trigger:landingScene,start:"top top",end:"bottom top",scrub:1.2}});
