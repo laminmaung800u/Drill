@@ -1475,6 +1475,7 @@ async function initialize3DExperience() {
   } catch (error) {
     landingScene.classList.add("scene3d-failed");
     travelScene.classList.add("scene3d-failed");
+    document.body.classList.add("story3d-failed");
     console.warn("Shared Chapter 1–2 3D experience unavailable; retaining the original 2D scenes.", error);
   }
 }
