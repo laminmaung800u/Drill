@@ -110,7 +110,67 @@ export async function createLandingExperience({mount,landingScene,gsap,ScrollTri
  makeBox(bus,.055,.55,.94,trim,1.57,.27,0,0,0,-.12);
  makeBox(bus,.045,.46,.40,glass,1.612,.29,-.235,0,0,-.12);
  makeBox(bus,.045,.46,.40,glass,1.612,.29,.235,0,0,-.12);
+
  makeBox(bus,.08,.08,1.02,yellowLight,1.57,.59,0,0,0,-.12);
+
+ // BUSSY's expressive face: glossy eyes seated on the front windshield.
+ // The eye geometry is part of the 3D bus, not a 2D decal.
+ const eyeWhite=mat(0xfffdf5,.24);
+ const iris=mat(0x45a9d8,.22,.08);
+ const pupil=mat(0x101a2a,.18);
+ const eyeSparkle=new THREE.MeshBasicMaterial({color:0xffffff});
+ for(const side of [-1,1]){
+   const z=side*.225;
+   const eye=new THREE.Mesh(new THREE.SphereGeometry(.145,24,18),eyeWhite);
+   eye.scale.set(.72,1,1);
+   eye.position.set(1.685,.345,z);
+   bus.add(eye);
+
+   const irisBall=new THREE.Mesh(new THREE.SphereGeometry(.083,20,16),iris);
+   irisBall.scale.set(.68,1,1);
+   irisBall.position.set(1.785,.34,z-side*.025);
+   bus.add(irisBall);
+
+   const pupilBall=new THREE.Mesh(new THREE.SphereGeometry(.048,18,14),pupil);
+   pupilBall.scale.set(.65,1,1);
+   pupilBall.position.set(1.84,.34,z-side*.035);
+   bus.add(pupilBall);
+
+   const sparkle=new THREE.Mesh(new THREE.SphereGeometry(.019,12,10),eyeSparkle);
+   sparkle.position.set(1.875,.375,z-side*.045);
+   bus.add(sparkle);
+
+   // Soft curved brows give the character a friendly, curious expression.
+   const browCurve=new THREE.CatmullRomCurve3([
+     new THREE.Vector3(1.69,.51,z-side*.13),
+     new THREE.Vector3(1.71,.56,z),
+     new THREE.Vector3(1.69,.52,z+side*.13)
+   ]);
+   const brow=new THREE.Mesh(new THREE.TubeGeometry(browCurve,12,.025,8,false),yellowDark);
+   bus.add(brow);
+ }
+
+ // A curved smile sits on the front panel below the windshield.
+ const smileCurve=new THREE.CatmullRomCurve3([
+   new THREE.Vector3(1.835,-.155,-.29),
+   new THREE.Vector3(1.855,-.205,-.17),
+   new THREE.Vector3(1.86,-.225,0),
+   new THREE.Vector3(1.855,-.205,.17),
+   new THREE.Vector3(1.835,-.155,.29)
+ ]);
+ const smile=new THREE.Mesh(
+   new THREE.TubeGeometry(smileCurve,28,.027,10,false),
+   mat(0x54251d,.55)
+ );
+ bus.add(smile);
+
+ // Tiny warm cheek lights add a little character without cluttering the body.
+ for(const side of [-1,1]){
+   const cheek=new THREE.Mesh(new THREE.SphereGeometry(.055,14,10),mat(0xff9a68,.65));
+   cheek.scale.set(.45,.7,1);
+   cheek.position.set(1.72,-.095,side*.38);
+   bus.add(cheek);
+ }
 
  // Friendly front bumper, grille and bright headlights.
  makeBox(bus,.22,.17,1.25,trim,1.68,-.39,0);
