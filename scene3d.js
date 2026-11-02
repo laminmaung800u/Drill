@@ -5,8 +5,8 @@
  */
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js";
 
-export async function createLandingExperience({mount,landingScene,gsap,ScrollTrigger}){
- if(!mount||!landingScene||!gsap||!ScrollTrigger)throw new Error("Missing 3D mount or animation dependencies.");
+export async function createStoryExperience({mount,landingScene,travelScene,gsap,ScrollTrigger}){
+ if(!mount||!landingScene||!travelScene||!gsap||!ScrollTrigger)throw new Error("Missing 3D mount, story scenes or animation dependencies.");
  const reduced=matchMedia("(prefers-reduced-motion: reduce)").matches;
  const mobile=matchMedia("(max-width: 620px)").matches;
  const lowPower=(navigator.hardwareConcurrency||4)<=4;
@@ -46,6 +46,41 @@ export async function createLandingExperience({mount,landingScene,gsap,ScrollTri
  const earth=new THREE.Mesh(new THREE.SphereGeometry(2.05,lowPower?40:64,lowPower?32:48),new THREE.MeshStandardMaterial({map:earthMap,roughness:.92,metalness:.02}));earthGroup.add(earth);
  earthGroup.add(new THREE.Mesh(new THREE.SphereGeometry(2.13,48,32),new THREE.MeshBasicMaterial({color:0x56aaff,transparent:true,opacity:.19,side:THREE.BackSide,blending:THREE.AdditiveBlending,depthWrite:false})));
  earthGroup.add(new THREE.Mesh(new THREE.SphereGeometry(2.17,48,32),new THREE.MeshBasicMaterial({color:0x9bdcff,transparent:true,opacity:.075,side:THREE.BackSide,depthWrite:false})));
+ // A realistic lunar globe using NASA's LRO/LROC 2025 color map.
+ // NASA SVS CGI Moon Kit: https://svs.gsfc.nasa.gov/4720/
+ // 2K map (2048x1024); a procedural crater map remains available if the CDN fails.
+ const moonCanvas=document.createElement("canvas");moonCanvas.width=1024;moonCanvas.height=512;
+ const moonCtx=moonCanvas.getContext("2d");
+ const moonBase=moonCtx.createLinearGradient(0,0,1024,512);
+ moonBase.addColorStop(0,"#a09d96");moonBase.addColorStop(.5,"#77756f");moonBase.addColorStop(1,"#aaa69d");
+ moonCtx.fillStyle=moonBase;moonCtx.fillRect(0,0,1024,512);
+ for(let i=0;i<430;i++){
+   const x=Math.random()*1024,y=Math.random()*512,r=2+Math.random()*19;
+   const crater=moonCtx.createRadialGradient(x-r*.22,y-r*.25,r*.12,x,y,r);
+   crater.addColorStop(0,"rgba(47,47,46,.46)");crater.addColorStop(.55,"rgba(83,82,78,.23)");
+   crater.addColorStop(.82,"rgba(190,187,178,.12)");crater.addColorStop(1,"rgba(45,45,44,.2)");
+   moonCtx.fillStyle=crater;moonCtx.beginPath();moonCtx.arc(x,y,r,0,Math.PI*2);moonCtx.fill();
+ }
+ const fallbackMoonMap=new THREE.CanvasTexture(moonCanvas);
+ fallbackMoonMap.colorSpace=THREE.SRGBColorSpace;
+ fallbackMoonMap.anisotropy=Math.min(renderer.capabilities.getMaxAnisotropy(),4);
+ const moonMaterial=new THREE.MeshStandardMaterial({map:fallbackMoonMap,roughness:1,metalness:0});
+ const moonGroup=new THREE.Group();
+ moonGroup.position.set(mobile?1.0:4.8,mobile?1.35:.45,-2.55);
+ moonGroup.scale.setScalar(.075);
+ scene.add(moonGroup);
+ const moon=new THREE.Mesh(new THREE.SphereGeometry(2.05,lowPower?48:72,lowPower?36:56),moonMaterial);
+ moonGroup.add(moon);
+ const moonTextureUrl="https://svs.gsfc.nasa.gov/vis/a000000/a004700/a004720/lroc_color_2k.jpg";
+ const moonLoader=new THREE.TextureLoader();moonLoader.setCrossOrigin("anonymous");
+ moonLoader.load(moonTextureUrl,texture=>{
+   if(disposed){texture.dispose();return;}
+   texture.colorSpace=THREE.SRGBColorSpace;
+   texture.anisotropy=Math.min(renderer.capabilities.getMaxAnisotropy(),4);
+   moonMaterial.map=texture;
+   moonMaterial.needsUpdate=true;
+ },undefined,()=>{ /* The procedural crater texture remains as a graceful offline fallback. */ });
+
 
  const count=lowPower?420:mobile?650:1050,positions=new Float32Array(count*3);
  for(let i=0;i<count;i++){positions[i*3]=(Math.random()-.5)*24;positions[i*3+1]=(Math.random()-.5)*13;positions[i*3+2]=-7-Math.random()*16;}
@@ -203,18 +238,52 @@ export async function createLandingExperience({mount,landingScene,gsap,ScrollTri
  makeBox(bus,.39,.075,.02,white,-.9,.78,.645);
  const glow=new THREE.PointLight(0x4c9fff,18,12,2);glow.position.set(-1.6,1.8,3.5);scene.add(glow);
 
- const cameraTween=gsap.fromTo(camera.position,{z:8.6,x:0,y:0},{z:7.7,x:.22,y:.12,ease:"none",scrollTrigger:{trigger:landingScene,start:"top top",end:"bottom top",scrub:1.2}});
- let busFloat=null,earthSpin=null;
- if(!reduced){busFloat=gsap.to(bus.position,{y:"-=.11",duration:3.4,ease:"sine.inOut",yoyo:true,repeat:-1});earthSpin=gsap.to(earth.rotation,{y:Math.PI*2,duration:150,ease:"none",repeat:-1});}
+ // One scrubbed timeline spans Chapter 1 and Chapter 2, so the camera,
+ // Earth, Moon and bus remain in the same world during the transition.
+ const journey=gsap.timeline({scrollTrigger:{
+   trigger:landingScene,start:"top top",endTrigger:travelScene,end:"bottom top",
+   scrub:1.15,invalidateOnRefresh:true
+ }});
+ journey
+   .to(camera.position,{x:mobile?0:.18,y:mobile?.08:.1,z:7.75},0)
+   .to(earthGroup.position,{x:mobile?-4.1:-6.25,y:mobile?1.25:1.05},0)
+   .to(earthGroup.scale,{x:.22,y:.22,z:.22},0)
+   // The Moon is still distant when Chapter 2 begins (timeline halfway).
+   .to(moonGroup.position,{x:mobile?.75:4.45,y:mobile?1.55:.5,z:-2.45},.5)
+   .to(moonGroup.scale,{x:.17,y:.17,z:.17},.5)
+   // It grows and moves toward the camera throughout the Moonbound chapter.
+   .to(moonGroup.position,{x:mobile?.1:2.65,y:mobile?1.25:.28,z:-1.75},1)
+   .to(moonGroup.scale,{x:mobile?1.12:1.34,y:mobile?1.12:1.34,z:mobile?1.12:1.34},1)
+   .to(bus.position,{x:mobile?.3:1.65,y:mobile?-1.22:-1.25,z:1.05},.5)
+   .to(bus.rotation,{y:-.27,z:-.065},.5)
+   .to(bus.position,{x:mobile?-.25:.2,y:mobile?-.72:-.76,z:.62},.72)
+   .to(bus.rotation,{y:-.43,z:.075},.72)
+   .to(bus.position,{x:mobile?.18:1.05,y:mobile?-1.18:-1.16,z:.9},.92)
+   .to(bus.rotation,{y:-.3,z:-.025},.92);
+ let busFloat=null,earthSpin=null,moonSpin=null;
+ if(!reduced){
+   busFloat=gsap.to(bus.rotation,{x:.018,duration:2.7,ease:"sine.inOut",yoyo:true,repeat:-1});
+   earthSpin=gsap.to(earth.rotation,{y:Math.PI*2,duration:150,ease:"none",repeat:-1});
+   moonSpin=gsap.to(moon.rotation,{y:Math.PI*2,duration:210,ease:"none",repeat:-1});
+ }
  const resize=()=>{if(disposed)return;const w=Math.max(1,mount.clientWidth||innerWidth),h=Math.max(1,mount.clientHeight||innerHeight);camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setPixelRatio(Math.min(devicePixelRatio||1,pixelCap));renderer.setSize(w,h,false);};
- const observer=new IntersectionObserver(entries=>{sceneVisible=!!entries[0]?.isIntersecting;},{threshold:.01});observer.observe(landingScene);
+ const visibleScenes=new Set();
+ const observer=new IntersectionObserver(entries=>{
+   entries.forEach(entry=>{
+     if(entry.isIntersecting)visibleScenes.add(entry.target);
+     else visibleScenes.delete(entry.target);
+   });
+   sceneVisible=visibleScenes.size>0;
+   mount.classList.toggle("is-active",sceneVisible);
+ },{threshold:.01});
+ observer.observe(landingScene);observer.observe(travelScene);
  const visibility=()=>{pageVisible=!document.hidden;if(pageVisible)last=0;};
  addEventListener("resize",resize,{passive:true});document.addEventListener("visibilitychange",visibility);resize();
  const render=time=>{if(disposed)return;raf=requestAnimationFrame(render);if(!pageVisible||!sceneVisible||time-last<33)return;last=time;stars.rotation.y+=reduced?0:.00012;renderer.render(scene,camera);};
  raf=requestAnimationFrame(render);
  return{dispose(){
   if(disposed)return;disposed=true;cancelAnimationFrame(raf);observer.disconnect();removeEventListener("resize",resize);document.removeEventListener("visibilitychange",visibility);
-  cameraTween.scrollTrigger?.kill();cameraTween.kill();busFloat?.kill();earthSpin?.kill();
+  journey.scrollTrigger?.kill();journey.kill();busFloat?.kill();earthSpin?.kill();moonSpin?.kill();
   scene.traverse(o=>{o.geometry?.dispose();if(o.material){const list=Array.isArray(o.material)?o.material:[o.material];list.forEach(m=>{Object.values(m).forEach(v=>{if(v?.isTexture)v.dispose();});m.dispose();});}});
   renderer.dispose();renderer.domElement.remove();
  }};
