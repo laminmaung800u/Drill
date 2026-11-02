@@ -5,8 +5,8 @@
  */
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js";
 
-export async function createStoryExperience({mount,landingScene,travelScene,gsap,ScrollTrigger}){
- if(!mount||!landingScene||!travelScene||!gsap||!ScrollTrigger)throw new Error("Missing 3D mount, story scenes or animation dependencies.");
+export async function createStoryExperience({mount,landingScene,travelScene,surfaceScene,gsap,ScrollTrigger}){
+ if(!mount||!landingScene||!travelScene||!surfaceScene||!gsap||!ScrollTrigger)throw new Error("Missing 3D mount, story scenes or animation dependencies.");
  const reduced=matchMedia("(prefers-reduced-motion: reduce)").matches;
  const mobile=matchMedia("(max-width: 620px)").matches;
  const lowPower=(navigator.hardwareConcurrency||4)<=4;
@@ -18,11 +18,18 @@ export async function createStoryExperience({mount,landingScene,travelScene,gsap
  renderer.setPixelRatio(Math.min(devicePixelRatio||1,pixelCap));
  renderer.setSize(mount.clientWidth||innerWidth,mount.clientHeight||innerHeight,false);
  renderer.outputColorSpace=THREE.SRGBColorSpace;
+ renderer.shadowMap.enabled=true;
+ renderer.shadowMap.type=THREE.PCFSoftShadowMap;
  renderer.toneMapping=THREE.ACESFilmicToneMapping;
  renderer.toneMappingExposure=1.15;
  mount.appendChild(renderer.domElement);
  scene.add(new THREE.AmbientLight(0x9dbdff,1.15));
- const key=new THREE.DirectionalLight(0xffe2b5,2.4);key.position.set(-4,5,7);scene.add(key);
+ const key=new THREE.DirectionalLight(0xffe2b5,2.4);
+ key.position.set(-4,5,7);key.castShadow=true;
+ key.shadow.mapSize.set(1024,1024);
+ key.shadow.camera.left=-24;key.shadow.camera.right=24;
+ key.shadow.camera.top=24;key.shadow.camera.bottom=-24;
+ scene.add(key);
 
  // Procedural stylized Earth texture; illustrative rather than geographic data.
  const mapCanvas=document.createElement("canvas");mapCanvas.width=1024;mapCanvas.height=512;
@@ -253,6 +260,181 @@ export async function createStoryExperience({mount,landingScene,travelScene,gsap
  makeBox(bus,.39,.075,.02,white,-.9,.78,.645);
  const glow=new THREE.PointLight(0x4c9fff,18,12,2);glow.position.set(-1.6,1.8,3.5);scene.add(glow);
 
+
+ // CHAPTER 3 — FIRST-PERSON LUNAR SURFACE
+ const surfaceGroup=new THREE.Group();
+ surfaceGroup.scale.setScalar(.001);
+ scene.add(surfaceGroup);
+
+ // Procedural regolith texture.
+ const regolithCanvas=document.createElement("canvas");
+ regolithCanvas.width=512;regolithCanvas.height=512;
+ const regolithCtx=regolithCanvas.getContext("2d");
+ regolithCtx.fillStyle="#77746d";regolithCtx.fillRect(0,0,512,512);
+ for(let i=0;i<9500;i++){
+   const x=Math.random()*512,y=Math.random()*512,r=.35+Math.random()*2.1;
+   const shade=70+Math.floor(Math.random()*100);
+   regolithCtx.fillStyle="rgba("+shade+","+shade+","+Math.max(65,shade-5)+","+(Math.random()*.22)+")";
+   regolithCtx.beginPath();regolithCtx.arc(x,y,r,0,Math.PI*2);regolithCtx.fill();
+ }
+ for(let i=0;i<95;i++){
+   const x=Math.random()*512,y=Math.random()*512,r=2+Math.random()*13;
+   regolithCtx.strokeStyle="rgba(35,35,34,.24)";regolithCtx.lineWidth=1+Math.random()*2;
+   regolithCtx.beginPath();regolithCtx.arc(x,y,r,0,Math.PI*2);regolithCtx.stroke();
+ }
+ const regolithTexture=new THREE.CanvasTexture(regolithCanvas);
+ regolithTexture.colorSpace=THREE.SRGBColorSpace;
+ regolithTexture.wrapS=THREE.RepeatWrapping;regolithTexture.wrapT=THREE.RepeatWrapping;
+ regolithTexture.repeat.set(18,18);
+ regolithTexture.anisotropy=Math.min(renderer.capabilities.getMaxAnisotropy(),4);
+
+ const groundGeometry=new THREE.PlaneGeometry(180,180,90,90);
+ const groundPositions=groundGeometry.attributes.position;
+ for(let i=0;i<groundPositions.count;i++){
+   const x=groundPositions.getX(i),z=groundPositions.getY(i);
+   groundPositions.setZ(i,Math.sin(x*.17)*.055+Math.cos(z*.13)*.045+Math.sin((x+z)*.075)*.035);
+ }
+ groundGeometry.computeVertexNormals();groundGeometry.rotateX(-Math.PI/2);
+ const groundMaterial=new THREE.MeshStandardMaterial({map:regolithTexture,color:0xb0aaa0,roughness:1,metalness:0});
+ const ground=new THREE.Mesh(groundGeometry,groundMaterial);
+ ground.position.set(0,-2.15,-34);ground.receiveShadow=true;surfaceGroup.add(ground);
+
+ // Distant crater rims and low lunar ridges.
+ const ridgeMaterial=new THREE.MeshStandardMaterial({color:0x45464a,roughness:1});
+ const ridgeLightMaterial=new THREE.MeshStandardMaterial({color:0x66635d,roughness:1});
+ const hillGeometry=new THREE.SphereGeometry(1,28,18);
+ [
+   [-23,-1.35,-49,18,2.1,8],[-3,-1.45,-54,20,2.6,9],
+   [20,-1.4,-51,17,2.0,8],[39,-1.5,-60,22,2.8,10]
+ ].forEach((v,i)=>{
+   const hill=new THREE.Mesh(hillGeometry,i%2?ridgeMaterial:ridgeLightMaterial);
+   hill.position.set(v[0],v[1],v[2]);hill.scale.set(v[3],v[4],v[5]);
+   hill.receiveShadow=true;surfaceGroup.add(hill);
+ });
+
+ const craterRimMaterial=new THREE.MeshStandardMaterial({color:0x96918a,roughness:1});
+ const craterFloorMaterial=new THREE.MeshStandardMaterial({color:0x56534e,roughness:1});
+ [[-5,-13,1.8],[7,-22,2.4],[-13,-29,2.1]].forEach((v)=>{
+   const floor=new THREE.Mesh(new THREE.CircleGeometry(v[2]*.9,40),craterFloorMaterial);
+   floor.rotation.x=-Math.PI/2;floor.position.set(v[0],-2.105,v[1]);surfaceGroup.add(floor);
+   const rim=new THREE.Mesh(new THREE.TorusGeometry(v[2],.085,8,48),craterRimMaterial);
+   rim.rotation.x=Math.PI/2;rim.position.set(v[0],-2.08,v[1]);surfaceGroup.add(rim);
+ });
+
+ // Angular lunar rocks in the foreground and middle distance.
+ const rockMaterials=[
+   new THREE.MeshStandardMaterial({color:0x77736c,roughness:1}),
+   new THREE.MeshStandardMaterial({color:0x5d5b57,roughness:1}),
+   new THREE.MeshStandardMaterial({color:0x99938a,roughness:1})
+ ];
+ for(let i=0;i<(mobile?34:58);i++){
+   const size=.12+Math.random()*.48;
+   const rock=new THREE.Mesh(new THREE.DodecahedronGeometry(size,0),rockMaterials[i%rockMaterials.length]);
+   const z=3-Math.random()*31,x=(Math.random()-.5)*(z>-8?23:34);
+   rock.position.set(x,-2.02+Math.random()*.08,z);
+   rock.rotation.set(Math.random()*1.2,Math.random()*Math.PI,Math.random()*1.2);
+   rock.scale.set(.8+Math.random()*.8,.55+Math.random()*.75,.75+Math.random()*.8);
+   rock.castShadow=true;rock.receiveShadow=true;surfaceGroup.add(rock);
+ }
+
+ // Apollo Lunar Module descent stage: octagonal platform, foil,
+ // descent engine, four landing legs and footpads.
+ const eagle=new THREE.Group();
+ eagle.position.set(mobile?.55:1.15,-.1,-4.8);
+ eagle.scale.setScalar(mobile?1.16:1.45);
+ surfaceGroup.add(eagle);
+
+ const foil=mat(0xb49a62,.88,.22),foilLight=mat(0xd0b77d,.82,.16);
+ const foilDark=mat(0x77694e,.9,.12),lunarMetal=mat(0x85898b,.72,.48);
+ const darkMetal=mat(0x34383d,.8,.3),facePlate=mat(0x45494d,.62,.32);
+ const eyeWhiteMat=mat(0xf7f2e7,.25),eyeIrisMat=mat(0x9bafbd,.28,.05);
+ const eyePupilMat=mat(0x20262b,.2),faceLineMat=mat(0x262b30,.62);
+ const sparkleMat=new THREE.MeshBasicMaterial({color:0xffffff});
+
+ const eagleBox=(w,h,d,material,x,y,z,rx=0,ry=0,rz=0)=>{
+   const mesh=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material);
+   mesh.position.set(x,y,z);mesh.rotation.set(rx,ry,rz);
+   mesh.castShadow=true;mesh.receiveShadow=true;eagle.add(mesh);return mesh;
+ };
+ const addStrut=(a,b,radius,material)=>{
+   const start=new THREE.Vector3(a[0],a[1],a[2]),end=new THREE.Vector3(b[0],b[1],b[2]);
+   const direction=new THREE.Vector3().subVectors(end,start);
+   const mesh=new THREE.Mesh(new THREE.CylinderGeometry(radius*.78,radius,direction.length(),10),material);
+   mesh.position.copy(start).add(end).multiplyScalar(.5);
+   mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),direction.normalize());
+   mesh.castShadow=true;mesh.receiveShadow=true;eagle.add(mesh);return mesh;
+ };
+
+ const descentBody=new THREE.Mesh(new THREE.CylinderGeometry(.82,.9,.82,8,1,false),foil);
+ descentBody.position.y=.48;descentBody.rotation.y=Math.PI/8;
+ descentBody.castShadow=true;descentBody.receiveShadow=true;eagle.add(descentBody);
+ const topDeck=new THREE.Mesh(new THREE.CylinderGeometry(.76,.76,.12,8),foilLight);
+ topDeck.position.y=.95;topDeck.rotation.y=Math.PI/8;
+ topDeck.castShadow=true;eagle.add(topDeck);
+ eagleBox(1.35,.12,1.18,foilDark,0,.98,0);
+
+ for(const side of [-1,1]){
+   eagleBox(.2,.48,.62,foilLight,side*.83,.51,0,0,0,side*.08);
+   eagleBox(.28,.28,.36,lunarMetal,side*.88,.43,.28);
+   eagleBox(.22,.2,.28,foilDark,side*.91,.72,-.28);
+ }
+ eagleBox(.48,.34,.12,lunarMetal,0,.52,-.86);
+ eagleBox(.38,.24,.1,foilDark,0,.28,-.9);
+
+ // Calm, wise face on the forward-facing equipment panel.
+ eagleBox(1.28,.62,.075,facePlate,0,.55,.855);
+ for(const side of [-1,1]){
+   const eye=new THREE.Mesh(new THREE.SphereGeometry(.145,24,18),eyeWhiteMat);
+   eye.scale.set(.88,1,.48);eye.position.set(side*.285,.66,.93);eagle.add(eye);
+   const iris=new THREE.Mesh(new THREE.SphereGeometry(.078,20,16),eyeIrisMat);
+   iris.scale.set(.85,1,.5);iris.position.set(side*.27,.65,.99);eagle.add(iris);
+   const pupilBall=new THREE.Mesh(new THREE.SphereGeometry(.042,18,14),eyePupilMat);
+   pupilBall.scale.set(.85,1,.5);pupilBall.position.set(side*.265,.65,1.025);eagle.add(pupilBall);
+   const glint=new THREE.Mesh(new THREE.SphereGeometry(.018,12,10),sparkleMat);
+   glint.position.set(side*.285,.69,1.045);eagle.add(glint);
+   const browCurve=new THREE.CatmullRomCurve3([
+     new THREE.Vector3(side*.43,.84,.97),new THREE.Vector3(side*.28,.87,.99),
+     new THREE.Vector3(side*.13,.84,.97)
+   ]);
+   eagle.add(new THREE.Mesh(new THREE.TubeGeometry(browCurve,16,.022,8,false),foilLight));
+ }
+ const wiseSmileCurve=new THREE.CatmullRomCurve3([
+   new THREE.Vector3(-.22,.37,.97),new THREE.Vector3(-.11,.32,.99),
+   new THREE.Vector3(0,.31,1.0),new THREE.Vector3(.11,.32,.99),
+   new THREE.Vector3(.22,.37,.97)
+ ]);
+ eagle.add(new THREE.Mesh(new THREE.TubeGeometry(wiseSmileCurve,24,.022,8,false),faceLineMat));
+
+ const legCorners=[
+   {a:[-.57,.2,-.52],b:[-1.28,-1.31,-1.04]},
+   {a:[.57,.2,-.52],b:[1.28,-1.31,-1.04]},
+   {a:[-.57,.2,.52],b:[-1.28,-1.31,1.04]},
+   {a:[.57,.2,.52],b:[1.28,-1.31,1.04]}
+ ];
+ legCorners.forEach((leg)=>{
+   addStrut(leg.a,leg.b,.065,lunarMetal);
+   addStrut([leg.a[0]*.78,0,leg.a[2]*.78],[leg.b[0]*.88,-.93,leg.b[2]*.88],.027,foilDark);
+   const foot=new THREE.Mesh(new THREE.CylinderGeometry(.25,.28,.09,16),lunarMetal);
+   foot.position.set(leg.b[0],-1.36,leg.b[2]);
+   foot.castShadow=true;foot.receiveShadow=true;eagle.add(foot);
+   const footTop=new THREE.Mesh(new THREE.CylinderGeometry(.17,.17,.035,16),foilDark);
+   footTop.position.set(leg.b[0],-1.295,leg.b[2]);eagle.add(footTop);
+ });
+
+ const engineBell=new THREE.Mesh(new THREE.CylinderGeometry(.19,.42,.62,14,1,true),darkMetal);
+ engineBell.position.set(0,-.62,0);engineBell.castShadow=true;eagle.add(engineBell);
+ const engineRim=new THREE.Mesh(new THREE.TorusGeometry(.4,.045,8,24),lunarMetal);
+ engineRim.rotation.x=Math.PI/2;engineRim.position.set(0,-.93,0);eagle.add(engineRim);
+ const strutHub=new THREE.Mesh(new THREE.BoxGeometry(.8,.12,.8),foilDark);
+ strutHub.position.y=-.05;strutHub.castShadow=true;eagle.add(strutHub);
+
+ const lunarSun=new THREE.DirectionalLight(0xffe0b5,2.1);
+ lunarSun.position.set(-8,11,7);lunarSun.castShadow=true;
+ lunarSun.shadow.mapSize.set(1024,1024);
+ lunarSun.shadow.camera.left=-30;lunarSun.shadow.camera.right=30;
+ lunarSun.shadow.camera.top=30;lunarSun.shadow.camera.bottom=-30;
+ scene.add(lunarSun);
+
  // One scrubbed timeline spans Chapter 1 and Chapter 2, so the camera,
  // Earth, Moon and bus remain in the same world during the transition.
  const journey=gsap.timeline({scrollTrigger:{
@@ -275,6 +457,20 @@ export async function createStoryExperience({mount,landingScene,travelScene,gsap
    .to(bus.rotation,{y:-.43,z:.075,duration:.2},.7)
    .to(bus.position,{x:mobile?.18:1.05,y:mobile?-1.18:-1.16,z:.9,duration:.1},.9)
    .to(bus.rotation,{y:-.3,z:-.025,duration:.1},.9);
+
+ // Chapter 3 landing: transition from the close Moon to a grounded POV.
+ const arrival=gsap.timeline({scrollTrigger:{
+   trigger:surfaceScene,start:"top top",end:"bottom top",
+   scrub:1.05,invalidateOnRefresh:true
+ }});
+ arrival
+   .to(moonGroup.position,{x:mobile?-.4:2.8,y:-6.5,z:-4.5,duration:.42},0)
+   .to(moonGroup.scale,{x:.001,y:.001,z:.001,duration:.42},0)
+   .to(bus.scale,{x:.001,y:.001,z:.001,duration:.2},0)
+   .to(surfaceGroup.scale,{x:1,y:1,z:1,duration:.48},.08)
+   .to(camera.position,{x:mobile?-.05:-.32,y:mobile?1.48:1.58,z:mobile?8.15:8.35,duration:.58},.04)
+   .to(camera.rotation,{x:-.105,y:0,z:0,duration:.58},.04);
+
  let busFloat=null,earthSpin=null,moonSpin=null;
  if(!reduced){
    busFloat=gsap.to(bus.rotation,{x:.018,duration:2.7,ease:"sine.inOut",yoyo:true,repeat:-1});
@@ -291,14 +487,14 @@ export async function createStoryExperience({mount,landingScene,travelScene,gsap
    sceneVisible=visibleScenes.size>0;
    mount.classList.toggle("is-active",sceneVisible);
  },{threshold:.01});
- observer.observe(landingScene);observer.observe(travelScene);
+ observer.observe(landingScene);observer.observe(travelScene);observer.observe(surfaceScene);
  const visibility=()=>{pageVisible=!document.hidden;if(pageVisible)last=0;};
  addEventListener("resize",resize,{passive:true});document.addEventListener("visibilitychange",visibility);resize();
  const render=time=>{if(disposed)return;raf=requestAnimationFrame(render);if(!pageVisible||!sceneVisible||time-last<33)return;last=time;stars.rotation.y+=reduced?0:.00012;renderer.render(scene,camera);};
  raf=requestAnimationFrame(render);
  return{dispose(){
   if(disposed)return;disposed=true;cancelAnimationFrame(raf);observer.disconnect();removeEventListener("resize",resize);document.removeEventListener("visibilitychange",visibility);
-  journey.scrollTrigger?.kill();journey.kill();busFloat?.kill();earthSpin?.kill();moonSpin?.kill();
+  journey.scrollTrigger?.kill();journey.kill();arrival.scrollTrigger?.kill();arrival.kill();busFloat?.kill();earthSpin?.kill();moonSpin?.kill();
   scene.traverse(o=>{o.geometry?.dispose();if(o.material){const list=Array.isArray(o.material)?o.material:[o.material];list.forEach(m=>{Object.values(m).forEach(v=>{if(v?.isTexture)v.dispose();});m.dispose();});}});
   renderer.dispose();renderer.domElement.remove();
  }};
