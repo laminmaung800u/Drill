@@ -1112,12 +1112,13 @@ a:focus-visible {
 
 
 /* CHAPTER 03 — FIRST-PERSON LUNAR ARRIVAL */
-#scene-03.scene3d-ready .background-layer {
-  background: #03050a !important;
-  transform: none;
+/* Let the transparent Three.js canvas show through Chapter 3.
+   Keep the original Eagle artwork visible until the GLB finishes loading. */
+body.story3d-ready #scene-03 .background-layer,
+body.story3d-ready #scene-03 .terrain-glow,
+body.story3d-ready #scene-03 .particle-field {
+  display: none !important;
 }
-#scene-03.scene3d-ready .terrain-glow,
-#scene-03.scene3d-ready .particle-field,
 #scene-03.scene3d-ready .character-stage {
   display: none !important;
 }
