@@ -1502,7 +1502,7 @@ async function initialize3DExperience() {
     if (scene3DController) {
       landingScene.classList.add("scene3d-ready");
       travelScene.classList.add("scene3d-ready");
-      surfaceScene.classList.add("scene3d-ready");
+      // Chapter 3 is marked ready only after its GLB has actually loaded.
       document.body.classList.add("story3d-ready");
     }
   } catch (error) {
