@@ -124,6 +124,19 @@ a:focus-visible {
   overflow: hidden;
 }
 
+/* Chapter 3 gets a little more scroll time for the lunar arrival.
+   Keep its foreground layout at one viewport tall so the copy stays
+   in its original position while the section and scrubbed 3D scene
+   continue for an additional quarter-viewport. */
+#scene-03 {
+  min-height: 125svh;
+  height: 125svh;
+}
+
+#scene-03 .scene-content {
+  height: 100svh;
+}
+
 .background-layer,
 .nebula-layer,
 .stars-layer,
