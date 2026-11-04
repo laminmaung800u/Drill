@@ -4,6 +4,7 @@
  * Uses the original bus.png as a texture; no original media is replaced.
  */
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js";
+import { GLTFLoader } from "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/loaders/GLTFLoader.js";
 
 export async function createStoryExperience({mount,landingScene,travelScene,surfaceScene,gsap,ScrollTrigger}){
  if(!mount||!landingScene||!travelScene||!surfaceScene||!gsap||!ScrollTrigger)throw new Error("Missing 3D mount, story scenes or animation dependencies.");
@@ -337,97 +338,65 @@ export async function createStoryExperience({mount,landingScene,travelScene,surf
    rock.castShadow=true;rock.receiveShadow=true;surfaceGroup.add(rock);
  }
 
- // Apollo Lunar Module descent stage: octagonal platform, foil,
- // descent engine, four landing legs and footpads.
- const eagle=new THREE.Group();
- eagle.position.set(mobile?.55:1.15,-.1,-4.8);
- eagle.scale.setScalar(mobile?1.16:1.45);
- surfaceGroup.add(eagle);
-
- const foil=mat(0xb49a62,.88,.22),foilLight=mat(0xd0b77d,.82,.16);
- const foilDark=mat(0x77694e,.9,.12),lunarMetal=mat(0x85898b,.72,.48);
- const darkMetal=mat(0x34383d,.8,.3),facePlate=mat(0x45494d,.62,.32);
- const eyeWhiteMat=mat(0xf7f2e7,.25),eyeIrisMat=mat(0x9bafbd,.28,.05);
- const eyePupilMat=mat(0x20262b,.2),faceLineMat=mat(0x262b30,.62);
- const sparkleMat=new THREE.MeshBasicMaterial({color:0xffffff});
-
- const eagleBox=(w,h,d,material,x,y,z,rx=0,ry=0,rz=0)=>{
-   const mesh=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material);
-   mesh.position.set(x,y,z);mesh.rotation.set(rx,ry,rz);
-   mesh.castShadow=true;mesh.receiveShadow=true;eagle.add(mesh);return mesh;
- };
- const addStrut=(a,b,radius,material)=>{
-   const start=new THREE.Vector3(a[0],a[1],a[2]),end=new THREE.Vector3(b[0],b[1],b[2]);
-   const direction=new THREE.Vector3().subVectors(end,start);
-   const mesh=new THREE.Mesh(new THREE.CylinderGeometry(radius*.78,radius,direction.length(),10),material);
-   mesh.position.copy(start).add(end).multiplyScalar(.5);
-   mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),direction.normalize());
-   mesh.castShadow=true;mesh.receiveShadow=true;eagle.add(mesh);return mesh;
- };
-
- const descentBody=new THREE.Mesh(new THREE.CylinderGeometry(.82,.9,.82,8,1,false),foil);
- descentBody.position.y=.48;descentBody.rotation.y=Math.PI/8;
- descentBody.castShadow=true;descentBody.receiveShadow=true;eagle.add(descentBody);
- const topDeck=new THREE.Mesh(new THREE.CylinderGeometry(.76,.76,.12,8),foilLight);
- topDeck.position.y=.95;topDeck.rotation.y=Math.PI/8;
- topDeck.castShadow=true;eagle.add(topDeck);
- eagleBox(1.35,.12,1.18,foilDark,0,.98,0);
-
- for(const side of [-1,1]){
-   eagleBox(.2,.48,.62,foilLight,side*.83,.51,0,0,0,side*.08);
-   eagleBox(.28,.28,.36,lunarMetal,side*.88,.43,.28);
-   eagleBox(.22,.2,.28,foilDark,side*.91,.72,-.28);
- }
- eagleBox(.48,.34,.12,lunarMetal,0,.52,-.86);
- eagleBox(.38,.24,.1,foilDark,0,.28,-.9);
-
- // Calm, wise face on the forward-facing equipment panel.
- eagleBox(1.28,.62,.075,facePlate,0,.55,.855);
- for(const side of [-1,1]){
-   const eye=new THREE.Mesh(new THREE.SphereGeometry(.145,24,18),eyeWhiteMat);
-   eye.scale.set(.88,1,.48);eye.position.set(side*.285,.66,.93);eagle.add(eye);
-   const iris=new THREE.Mesh(new THREE.SphereGeometry(.078,20,16),eyeIrisMat);
-   iris.scale.set(.85,1,.5);iris.position.set(side*.27,.65,.99);eagle.add(iris);
-   const pupilBall=new THREE.Mesh(new THREE.SphereGeometry(.042,18,14),eyePupilMat);
-   pupilBall.scale.set(.85,1,.5);pupilBall.position.set(side*.265,.65,1.025);eagle.add(pupilBall);
-   const glint=new THREE.Mesh(new THREE.SphereGeometry(.018,12,10),sparkleMat);
-   glint.position.set(side*.285,.69,1.045);eagle.add(glint);
-   const browCurve=new THREE.CatmullRomCurve3([
-     new THREE.Vector3(side*.43,.84,.97),new THREE.Vector3(side*.28,.87,.99),
-     new THREE.Vector3(side*.13,.84,.97)
-   ]);
-   eagle.add(new THREE.Mesh(new THREE.TubeGeometry(browCurve,16,.022,8,false),foilLight));
- }
- const wiseSmileCurve=new THREE.CatmullRomCurve3([
-   new THREE.Vector3(-.22,.37,.97),new THREE.Vector3(-.11,.32,.99),
-   new THREE.Vector3(0,.31,1.0),new THREE.Vector3(.11,.32,.99),
-   new THREE.Vector3(.22,.37,.97)
- ]);
- eagle.add(new THREE.Mesh(new THREE.TubeGeometry(wiseSmileCurve,24,.022,8,false),faceLineMat));
-
- const legCorners=[
-   {a:[-.57,.2,-.52],b:[-1.28,-1.31,-1.04]},
-   {a:[.57,.2,-.52],b:[1.28,-1.31,-1.04]},
-   {a:[-.57,.2,.52],b:[-1.28,-1.31,1.04]},
-   {a:[.57,.2,.52],b:[1.28,-1.31,1.04]}
- ];
- legCorners.forEach((leg)=>{
-   addStrut(leg.a,leg.b,.065,lunarMetal);
-   addStrut([leg.a[0]*.78,0,leg.a[2]*.78],[leg.b[0]*.88,-.93,leg.b[2]*.88],.027,foilDark);
-   const foot=new THREE.Mesh(new THREE.CylinderGeometry(.25,.28,.09,16),lunarMetal);
-   foot.position.set(leg.b[0],-1.36,leg.b[2]);
-   foot.castShadow=true;foot.receiveShadow=true;eagle.add(foot);
-   const footTop=new THREE.Mesh(new THREE.CylinderGeometry(.17,.17,.035,16),foilDark);
-   footTop.position.set(leg.b[0],-1.295,leg.b[2]);eagle.add(footTop);
- });
-
- const engineBell=new THREE.Mesh(new THREE.CylinderGeometry(.19,.42,.62,14,1,true),darkMetal);
- engineBell.position.set(0,-.62,0);engineBell.castShadow=true;eagle.add(engineBell);
- const engineRim=new THREE.Mesh(new THREE.TorusGeometry(.4,.045,8,24),lunarMetal);
- engineRim.rotation.x=Math.PI/2;engineRim.position.set(0,-.93,0);eagle.add(engineRim);
- const strutHub=new THREE.Mesh(new THREE.BoxGeometry(.8,.12,.8),foilDark);
- strutHub.position.y=-.05;strutHub.castShadow=true;eagle.add(strutHub);
-
+ // Load the user's Tripo-generated Apollo 11 Eagle GLB.
+ // The GLB already contains its own face and materials, so no duplicate
+ // procedural eyes or mouth are added here.
+ const eagleRoot=new THREE.Group();
+ eagleRoot.position.set(mobile?.55:1.15,-2.13,-4.8);
+ eagleRoot.rotation.y=mobile?-.05:-.1;
+ surfaceGroup.add(eagleRoot);
+ let eagleLoaded=false;
+ const eagleLoader=new GLTFLoader();
+ eagleLoader.load(
+   "./assets/models/apollo-11-eagle-descent-stage.glb",
+   (gltf)=>{
+     if(disposed){
+       gltf.scene.traverse(o=>{
+         o.geometry?.dispose();
+         if(o.material)(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>{
+           Object.values(m).forEach(v=>{if(v?.isTexture)v.dispose();});
+           m.dispose();
+         });
+       });
+       return;
+     }
+     const model=gltf.scene;
+     const bounds=new THREE.Box3().setFromObject(model);
+     const center=bounds.getCenter(new THREE.Vector3());
+     const dimensions=bounds.getSize(new THREE.Vector3());
+     // Center the model over its landing point and place its lowest point
+     // on the lunar ground plane. The inspected GLB is Y-up.
+     model.position.x-=center.x;
+     model.position.z-=center.z;
+     model.position.y-=bounds.min.y;
+     const targetHeight=3.35;
+     const scale=targetHeight/Math.max(dimensions.y,.001);
+     eagleRoot.scale.setScalar(scale);
+     model.traverse(object=>{
+       if(!object.isMesh)return;
+       object.castShadow=true;
+       object.receiveShadow=true;
+       if(Array.isArray(object.material)){
+         object.material.forEach(material=>{material.needsUpdate=true;});
+       }else if(object.material){
+         object.material.needsUpdate=true;
+       }
+     });
+     eagleRoot.add(model);
+     eagleLoaded=true;
+     surfaceScene.classList.add("scene3d-ready");
+     surfaceScene.classList.remove("scene3d-failed");
+   },
+   (progress)=>{
+     if(progress.total>0){
+       mount.dataset.eagleLoadProgress=String(Math.round(progress.loaded/progress.total*100));
+     }
+   },
+   (error)=>{
+     console.error("Apollo 11 Eagle GLB could not be loaded; retaining the original 2D Eagle artwork.",error);
+     surfaceScene.classList.add("scene3d-failed");
+   }
+ );
  const lunarSun=new THREE.DirectionalLight(0xffe0b5,2.1);
  lunarSun.position.set(-8,11,7);lunarSun.castShadow=true;
  lunarSun.shadow.mapSize.set(1024,1024);
