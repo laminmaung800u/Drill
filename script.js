@@ -647,6 +647,9 @@ function handleSceneEnter(sceneElement) {
       } else if (objectKey === "lrv") {
         resetNarrationCaption("lrvCaption");
         connectNarrationCaptionToAudio(AudioManager.narration, "lrvCaption", [0.02, 0.20, 0.68, 0.84, 0.92]);
+      } else if (objectKey === "alsep") {
+        resetNarrationCaption("alsepCaption");
+        connectNarrationCaptionToAudio(AudioManager.narration, "alsepCaption", [0.02, 0.20, 0.48, 0.68, 0.86]);
       }
     }
 
@@ -1491,9 +1494,10 @@ async function initialize3DExperience() {
   const travelScene = document.getElementById("scene-02");
   const surfaceScene = document.getElementById("scene-03");
   const lrvScene = document.getElementById("scene-04");
+  const alsepScene = document.getElementById("scene-05");
   const mount = document.getElementById("scene3d-root");
 
-  if (!landingScene || !travelScene || !surfaceScene || !lrvScene || !mount || !window.gsap || !window.ScrollTrigger) return;
+  if (!landingScene || !travelScene || !surfaceScene || !lrvScene || !alsepScene || !mount || !window.gsap || !window.ScrollTrigger) return;
 
   try {
     const module = await import("./scene3d.js");
@@ -1503,6 +1507,7 @@ async function initialize3DExperience() {
       travelScene,
       surfaceScene,
       lrvScene,
+      alsepScene,
       gsap: window.gsap,
       ScrollTrigger: window.ScrollTrigger
     });
@@ -1518,7 +1523,8 @@ async function initialize3DExperience() {
     travelScene.classList.add("scene3d-failed");
     surfaceScene.classList.add("scene3d-failed");
     lrvScene.classList.add("scene3d-failed");
+    alsepScene.classList.add("scene3d-failed");
     document.body.classList.add("story3d-failed");
-    console.warn("Shared Chapter 1–4 3D experience unavailable; retaining the original 2D scenes.", error);
+    console.warn("Shared Chapter 1–5 3D experience unavailable; retaining the original 2D scenes.", error);
   }
 }
