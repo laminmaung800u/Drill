@@ -578,16 +578,15 @@ function getObjectKeyFromScene(sceneElement) {
 }
 
 
-function resetEagleCaption() {
-  document.querySelectorAll("#eagleCaption [data-caption-line]").forEach((line) => {
+function resetNarrationCaption(captionId) {
+  document.querySelectorAll(`#${captionId} [data-caption-line]`).forEach((line) => {
     line.classList.remove("is-revealed");
   });
 }
 
-function connectEagleCaptionToNarration(audio) {
+function connectNarrationCaptionToAudio(audio, captionId, revealAt) {
   if (!audio) return;
-  const lines = Array.from(document.querySelectorAll("#eagleCaption [data-caption-line]"));
-  const revealAt = [0.02, 0.22, 0.46, 0.68, 0.82];
+  const lines = Array.from(document.querySelectorAll(`#${captionId} [data-caption-line]`));
   const updateCaption = () => {
     if (!Number.isFinite(audio.duration) || audio.duration <= 0) return;
     const progress = audio.currentTime / audio.duration;
@@ -643,8 +642,11 @@ function handleSceneEnter(sceneElement) {
     if (objectData) {
       AudioManager.playNarration(objectData.audio);
       if (objectKey === "eagle") {
-        resetEagleCaption();
-        connectEagleCaptionToNarration(AudioManager.narration);
+        resetNarrationCaption("eagleCaption");
+        connectNarrationCaptionToAudio(AudioManager.narration, "eagleCaption", [0.02, 0.22, 0.46, 0.68, 0.82]);
+      } else if (objectKey === "lrv") {
+        resetNarrationCaption("lrvCaption");
+        connectNarrationCaptionToAudio(AudioManager.narration, "lrvCaption", [0.02, 0.20, 0.68, 0.84, 0.92]);
       }
     }
 
