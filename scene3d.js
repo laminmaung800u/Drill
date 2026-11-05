@@ -6,8 +6,8 @@
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js";
 import { GLTFLoader } from "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/loaders/GLTFLoader.js";
 
-export async function createStoryExperience({mount,landingScene,travelScene,surfaceScene,lrvScene,gsap,ScrollTrigger}){
- if(!mount||!landingScene||!travelScene||!surfaceScene||!lrvScene||!gsap||!ScrollTrigger)throw new Error("Missing 3D mount, story scenes or animation dependencies.");
+export async function createStoryExperience({mount,landingScene,travelScene,surfaceScene,lrvScene,alsepScene,gsap,ScrollTrigger}){
+ if(!mount||!landingScene||!travelScene||!surfaceScene||!lrvScene||!alsepScene||!gsap||!ScrollTrigger)throw new Error("Missing 3D mount, story scenes or animation dependencies.");
  const reduced=matchMedia("(prefers-reduced-motion: reduce)").matches;
  const mobile=matchMedia("(max-width: 620px)").matches;
  const lowPower=(navigator.hardwareConcurrency||4)<=4;
@@ -468,6 +468,76 @@ export async function createStoryExperience({mount,landingScene,travelScene,surf
    onEnter:loadLrvModel
  });
 
+ // CHAPTER 5 — ALSEP SCIENCE STATIONS
+ // Load the station package shortly before Chapter 5; keep the same lunar
+ // ground, star field, lighting and camera used by the previous chapters.
+ const alsepRoot=new THREE.Group();
+ alsepRoot.position.set(mobile?4.8:5.6,-2.13,-4.9);
+ alsepRoot.rotation.y=mobile?-.16:-.24;
+ alsepRoot.visible=false;
+ surfaceGroup.add(alsepRoot);
+ let alsepLoaded=false;
+ const alsepLoader=new GLTFLoader();
+ const loadAlsepModel=()=>{
+   if(alsepLoaded||disposed)return;
+   alsepLoader.load(
+     "./assets/models/alsep-science-station.glb",
+     (gltf)=>{
+       if(disposed){
+         gltf.scene.traverse(o=>{
+           o.geometry?.dispose();
+           if(o.material)(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>{
+             Object.values(m).forEach(v=>{if(v?.isTexture)v.dispose();});
+             m.dispose();
+           });
+         });
+         return;
+       }
+       const model=gltf.scene;
+       const bounds=new THREE.Box3().setFromObject(model);
+       const center=bounds.getCenter(new THREE.Vector3());
+       const dimensions=bounds.getSize(new THREE.Vector3());
+       model.position.x-=center.x;
+       model.position.z-=center.z;
+       model.position.y-=bounds.min.y;
+       const horizontalSpan=Math.max(dimensions.x,dimensions.z);
+       const targetLength=mobile?3.25:4.55;
+       alsepRoot.scale.setScalar(targetLength/Math.max(horizontalSpan,.001));
+       model.traverse(object=>{
+         if(!object.isMesh)return;
+         object.castShadow=true;
+         object.receiveShadow=true;
+         if(Array.isArray(object.material)){
+           object.material.forEach(material=>{material.needsUpdate=true;});
+         }else if(object.material){
+           object.material.needsUpdate=true;
+         }
+       });
+       alsepRoot.add(model);
+       alsepRoot.visible=true;
+       alsepLoaded=true;
+       alsepScene.classList.add("scene3d-ready");
+       alsepScene.classList.remove("scene3d-failed");
+       ScrollTrigger.refresh();
+     },
+     (progress)=>{
+       if(progress.total>0){
+         mount.dataset.alsepLoadProgress=String(Math.round(progress.loaded/progress.total*100));
+       }
+     },
+     (error)=>{
+       console.error("ALSEP Science Station GLB could not be loaded; retaining the original 2D ALSEP artwork.",error);
+       alsepScene.classList.add("scene3d-failed");
+     }
+   );
+ };
+ const alsepLoadTrigger=ScrollTrigger.create({
+   trigger:alsepScene,
+   start:"top 125%",
+   once:true,
+   onEnter:loadAlsepModel
+ });
+
  // A restrained veil of lunar regolith particles sweeps across the foreground
  // during the handoff. It is a visual accent, not a simulated atmospheric plume.
  const dustCount=mobile?110:190;
@@ -546,6 +616,21 @@ export async function createStoryExperience({mount,landingScene,travelScene,surf
    .fromTo(dustMaterial,{opacity:0},{opacity:mobile?.17:.22,duration:.2},.15)
    .to(dustMaterial,{opacity:0,duration:.34},.58);
 
+ // Chapter 5 — hand off the rover to the ALSEP science station package.
+ // No new environment is created: the lunar surface and sky remain continuous.
+ const scienceHandoff=gsap.timeline({scrollTrigger:{
+   trigger:alsepScene,start:"top top",end:"bottom top",
+   scrub:1.05,invalidateOnRefresh:true
+ }});
+ scienceHandoff
+   .to(lrvRoot.position,{x:mobile?-4.2:-5.2,y:-2.13,z:-7.6,duration:1},0)
+   .to(alsepRoot.position,{x:mobile?.85:1.2,y:-2.13,z:-4.7,duration:1},0)
+   .to(camera.position,{x:mobile?-.05:-.3,y:mobile?1.48:1.58,z:mobile?8.15:8.35,duration:1},0)
+   .to(camera.rotation,{x:-.105,y:0,z:0,duration:1},0)
+   .fromTo(dustSweep.position,{x:-5.2},{x:5.2,duration:.72,ease:"none"},.12)
+   .fromTo(dustMaterial,{opacity:0},{opacity:mobile?.15:.2,duration:.2},.15)
+   .to(dustMaterial,{opacity:0,duration:.34},.58);
+
  let busFloat=null,earthSpin=null,moonSpin=null;
  if(!reduced){
    busFloat=gsap.to(bus.rotation,{x:.018,duration:2.7,ease:"sine.inOut",yoyo:true,repeat:-1});
@@ -562,14 +647,14 @@ export async function createStoryExperience({mount,landingScene,travelScene,surf
    sceneVisible=visibleScenes.size>0;
    mount.classList.toggle("is-active",sceneVisible);
  },{threshold:.01});
- observer.observe(landingScene);observer.observe(travelScene);observer.observe(surfaceScene);observer.observe(lrvScene);
+ observer.observe(landingScene);observer.observe(travelScene);observer.observe(surfaceScene);observer.observe(lrvScene);observer.observe(alsepScene);
  const visibility=()=>{pageVisible=!document.hidden;if(pageVisible)last=0;};
  addEventListener("resize",resize,{passive:true});document.addEventListener("visibilitychange",visibility);resize();
  const render=time=>{if(disposed)return;raf=requestAnimationFrame(render);if(!pageVisible||!sceneVisible||time-last<33)return;last=time;stars.rotation.y+=reduced?0:.00012;renderer.render(scene,camera);};
  raf=requestAnimationFrame(render);
  return{dispose(){
   if(disposed)return;disposed=true;cancelAnimationFrame(raf);observer.disconnect();removeEventListener("resize",resize);document.removeEventListener("visibilitychange",visibility);
-  journey.scrollTrigger?.kill();journey.kill();arrival.scrollTrigger?.kill();arrival.kill();roverHandoff.scrollTrigger?.kill();roverHandoff.kill();lrvLoadTrigger.kill();busFloat?.kill();earthSpin?.kill();moonSpin?.kill();
+  journey.scrollTrigger?.kill();journey.kill();arrival.scrollTrigger?.kill();arrival.kill();roverHandoff.scrollTrigger?.kill();roverHandoff.kill();scienceHandoff.scrollTrigger?.kill();scienceHandoff.kill();lrvLoadTrigger.kill();alsepLoadTrigger.kill();busFloat?.kill();earthSpin?.kill();moonSpin?.kill();
   scene.traverse(o=>{o.geometry?.dispose();if(o.material){const list=Array.isArray(o.material)?o.material:[o.material];list.forEach(m=>{Object.values(m).forEach(v=>{if(v?.isTexture)v.dispose();});m.dispose();});}});
   renderer.dispose();renderer.domElement.remove();
  }};
