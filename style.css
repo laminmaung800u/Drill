@@ -1465,3 +1465,21 @@ body.story3d-failed #scene3d-root{display:none}
 @media (prefers-reduced-motion: reduce) {
   #scene-05 .alsep-caption p { transition: none; transform: none; }
 }
+
+
+/* ============================================================
+   CHAPTER 06 — 3D MARS APPROACH
+   Keep the chapter copy and engine audio; the shared Three.js
+   world supplies the star field, 3D bus and Mars globe.
+   ============================================================ */
+#scene-06.scene3d-ready .background-layer,
+#scene-06.scene3d-ready .nebula-layer,
+#scene-06.scene3d-ready .stars-layer,
+#scene-06.scene3d-ready .celestial-object,
+#scene-06.scene3d-ready .travel-bus {
+  display: none !important;
+}
+#scene-06.scene3d-ready .scene-content {
+  position: relative;
+  z-index: 2;
+}
