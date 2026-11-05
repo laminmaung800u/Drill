@@ -539,7 +539,6 @@ export async function createStoryExperience({mount,landingScene,travelScene,surf
  }});
  roverHandoff
    .to(eagleRoot.position,{x:mobile?-3.05:-4.15,y:-2.13,z:-7.5,duration:1},0)
-   .to(eagleRoot.scale,{x:eagleRoot.scale.x*.62,y:eagleRoot.scale.y*.62,z:eagleRoot.scale.z*.62,duration:1},0)
    .to(lrvRoot.position,{x:mobile?-1.05:-1.45,y:-2.13,z:-4.55,duration:1},0)
    .to(camera.position,{x:mobile?-.28:.22,y:mobile?1.55:1.64,z:mobile?8.1:8.0,duration:1},0)
    .to(camera.rotation,{x:-.115,y:mobile?-.012:.018,z:0,duration:1},0)
