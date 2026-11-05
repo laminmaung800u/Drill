@@ -6,8 +6,8 @@
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js";
 import { GLTFLoader } from "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/loaders/GLTFLoader.js";
 
-export async function createStoryExperience({mount,landingScene,travelScene,surfaceScene,lrvScene,alsepScene,gsap,ScrollTrigger}){
- if(!mount||!landingScene||!travelScene||!surfaceScene||!lrvScene||!alsepScene||!gsap||!ScrollTrigger)throw new Error("Missing 3D mount, story scenes or animation dependencies.");
+export async function createStoryExperience({mount,landingScene,travelScene,marsTravelScene,surfaceScene,lrvScene,alsepScene,gsap,ScrollTrigger}){
+ if(!mount||!landingScene||!travelScene||!marsTravelScene||!surfaceScene||!lrvScene||!alsepScene||!gsap||!ScrollTrigger)throw new Error("Missing 3D mount, story scenes or animation dependencies.");
  const reduced=matchMedia("(prefers-reduced-motion: reduce)").matches;
  const mobile=matchMedia("(max-width: 620px)").matches;
  const lowPower=(navigator.hardwareConcurrency||4)<=4;
@@ -109,6 +109,50 @@ export async function createStoryExperience({mount,landingScene,travelScene,surf
  for(let i=0;i<count;i++){positions[i*3]=(Math.random()-.5)*24;positions[i*3+1]=(Math.random()-.5)*13;positions[i*3+2]=-7-Math.random()*16;}
  const starGeometry=new THREE.BufferGeometry();starGeometry.setAttribute("position",new THREE.BufferAttribute(positions,3));
  const stars=new THREE.Points(starGeometry,new THREE.PointsMaterial({color:0xdceaff,size:.035,transparent:true,opacity:.88,depthWrite:false}));scene.add(stars);
+
+ // CHAPTER 6 — PROCEDURAL 3D MARS
+ // A locally generated equirectangular surface keeps the globe self-contained.
+ const marsCanvas=document.createElement("canvas");
+ marsCanvas.width=1024;marsCanvas.height=512;
+ const marsCtx=marsCanvas.getContext("2d");
+ const marsBase=marsCtx.createLinearGradient(0,0,1024,512);
+ marsBase.addColorStop(0,"#b96848");marsBase.addColorStop(.34,"#9f4d36");
+ marsBase.addColorStop(.68,"#c77b55");marsBase.addColorStop(1,"#6f3027");
+ marsCtx.fillStyle=marsBase;marsCtx.fillRect(0,0,1024,512);
+ for(let i=0;i<95;i++){
+   const x=Math.random()*1024,y=30+Math.random()*452,rw=18+Math.random()*100,rh=8+Math.random()*42;
+   marsCtx.fillStyle=Math.random()>.52?"rgba(75,35,29,.17)":"rgba(235,157,105,.16)";
+   marsCtx.beginPath();marsCtx.ellipse(x,y,rw,rh,Math.random()*.8,0,Math.PI*2);marsCtx.fill();
+ }
+ for(let i=0;i<360;i++){
+   const x=Math.random()*1024,y=20+Math.random()*472,r=1.5+Math.random()*12;
+   const crater=marsCtx.createRadialGradient(x-r*.24,y-r*.28,r*.08,x,y,r);
+   crater.addColorStop(0,"rgba(72,35,29,.34)");crater.addColorStop(.52,"rgba(93,43,32,.18)");
+   crater.addColorStop(.78,"rgba(232,157,111,.19)");crater.addColorStop(1,"rgba(67,31,27,.22)");
+   marsCtx.fillStyle=crater;marsCtx.beginPath();marsCtx.arc(x,y,r,0,Math.PI*2);marsCtx.fill();
+ }
+ const northCap=marsCtx.createLinearGradient(0,0,0,58);
+ northCap.addColorStop(0,"rgba(239,216,190,.78)");northCap.addColorStop(1,"rgba(239,216,190,0)");
+ marsCtx.fillStyle=northCap;marsCtx.fillRect(0,0,1024,58);
+ const southCap=marsCtx.createLinearGradient(0,454,0,512);
+ southCap.addColorStop(0,"rgba(239,216,190,0)");southCap.addColorStop(1,"rgba(239,216,190,.68)");
+ marsCtx.fillStyle=southCap;marsCtx.fillRect(0,454,1024,58);
+ const marsTexture=new THREE.CanvasTexture(marsCanvas);
+ marsTexture.colorSpace=THREE.SRGBColorSpace;
+ marsTexture.anisotropy=Math.min(renderer.capabilities.getMaxAnisotropy(),4);
+ const marsGroup=new THREE.Group();
+ marsGroup.position.set(mobile?2.5:3.4,.55,-8.8);
+ marsGroup.scale.setScalar(.001);
+ scene.add(marsGroup);
+ const marsSphere=new THREE.Mesh(
+   new THREE.SphereGeometry(2.05,lowPower?48:72,lowPower?36:56),
+   new THREE.MeshStandardMaterial({map:marsTexture,roughness:.98,metalness:0})
+ );
+ marsGroup.add(marsSphere);
+ marsGroup.add(new THREE.Mesh(
+   new THREE.SphereGeometry(2.16,48,36),
+   new THREE.MeshBasicMaterial({color:0xe87952,transparent:true,opacity:.17,side:THREE.BackSide,blending:THREE.AdditiveBlending,depthWrite:false})
+ ));
 
  // Build BUSSY as a real low-poly 3D school bus from reusable Three.js meshes.
  // This replaces the flat PNG plane; the original PNG remains untouched in assets.
@@ -631,11 +675,34 @@ export async function createStoryExperience({mount,landingScene,travelScene,surf
    .fromTo(dustMaterial,{opacity:0},{opacity:mobile?.15:.2,duration:.2},.15)
    .to(dustMaterial,{opacity:0,duration:.34},.58);
 
- let busFloat=null,earthSpin=null,moonSpin=null;
+ // CHAPTER 6 — transition from the lunar surface into a Mars-bound flight.
+  // Reuse the exact 3D bus and star field already built for Chapters 1–2.
+  // The Chapter 6 engine sound remains managed independently by script.js.
+  const marsJourney=gsap.timeline({scrollTrigger:{
+    trigger:marsTravelScene,start:"top top",end:"bottom top",
+    scrub:1.1,invalidateOnRefresh:true
+  }});
+  marsJourney
+    .to(surfaceGroup.scale,{x:.001,y:.001,z:.001,duration:.24},0)
+    .to(camera.position,{x:0,y:0,z:8.6,duration:.42},0)
+    .to(camera.rotation,{x:0,y:0,z:0,duration:.42},0)
+    .to(moonGroup.position,{x:mobile?-4.1:-4.8,y:1.15,z:-4.8,duration:.42},0)
+    .to(moonGroup.scale,{x:.14,y:.14,z:.14,duration:.42},0)
+    .to(bus.position,{x:mobile?-1.95:-2.35,y:mobile?-.56:-.58,z:1.25,duration:.24},0)
+    .to(bus.rotation,{x:0,y:-.3,z:.045,duration:.24},0)
+    .to(bus.scale,{x:mobile?.62:.94,y:mobile?.62:.94,z:mobile?.62:.94,duration:.2},0)
+    .to(marsGroup.position,{x:mobile?1.55:2.55,y:.12,z:-2.9,duration:.82},.18)
+    .to(marsGroup.scale,{x:mobile?.94:1.22,y:mobile?.94:1.22,z:mobile?.94:1.22,duration:.82},.18)
+    .to(bus.position,{x:mobile?-.9:-1.15,y:mobile?-.52:-.54,z:.9,duration:.72},.24)
+    .to(bus.rotation,{y:-.18,z:.018,duration:.72},.24)
+    .to(bus.scale,{x:mobile?.5:.76,y:mobile?.5:.76,z:mobile?.5:.76,duration:.72},.24);
+
+  let busFloat=null,earthSpin=null,moonSpin=null,marsSpin=null;
  if(!reduced){
    busFloat=gsap.to(bus.rotation,{x:.018,duration:2.7,ease:"sine.inOut",yoyo:true,repeat:-1});
    earthSpin=gsap.to(earth.rotation,{y:Math.PI*2,duration:150,ease:"none",repeat:-1});
    moonSpin=gsap.to(moon.rotation,{y:Math.PI*2,duration:210,ease:"none",repeat:-1});
+   marsSpin=gsap.to(marsSphere.rotation,{y:Math.PI*2,duration:185,ease:"none",repeat:-1});
  }
  const resize=()=>{if(disposed)return;const w=Math.max(1,mount.clientWidth||innerWidth),h=Math.max(1,mount.clientHeight||innerHeight);camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setPixelRatio(Math.min(devicePixelRatio||1,pixelCap));renderer.setSize(w,h,false);};
  const visibleScenes=new Set();
@@ -647,14 +714,14 @@ export async function createStoryExperience({mount,landingScene,travelScene,surf
    sceneVisible=visibleScenes.size>0;
    mount.classList.toggle("is-active",sceneVisible);
  },{threshold:.01});
- observer.observe(landingScene);observer.observe(travelScene);observer.observe(surfaceScene);observer.observe(lrvScene);observer.observe(alsepScene);
+ observer.observe(landingScene);observer.observe(travelScene);observer.observe(marsTravelScene);observer.observe(surfaceScene);observer.observe(lrvScene);observer.observe(alsepScene);
  const visibility=()=>{pageVisible=!document.hidden;if(pageVisible)last=0;};
  addEventListener("resize",resize,{passive:true});document.addEventListener("visibilitychange",visibility);resize();
  const render=time=>{if(disposed)return;raf=requestAnimationFrame(render);if(!pageVisible||!sceneVisible||time-last<33)return;last=time;stars.rotation.y+=reduced?0:.00012;renderer.render(scene,camera);};
  raf=requestAnimationFrame(render);
  return{dispose(){
   if(disposed)return;disposed=true;cancelAnimationFrame(raf);observer.disconnect();removeEventListener("resize",resize);document.removeEventListener("visibilitychange",visibility);
-  journey.scrollTrigger?.kill();journey.kill();arrival.scrollTrigger?.kill();arrival.kill();roverHandoff.scrollTrigger?.kill();roverHandoff.kill();scienceHandoff.scrollTrigger?.kill();scienceHandoff.kill();lrvLoadTrigger.kill();alsepLoadTrigger.kill();busFloat?.kill();earthSpin?.kill();moonSpin?.kill();
+  journey.scrollTrigger?.kill();journey.kill();arrival.scrollTrigger?.kill();arrival.kill();roverHandoff.scrollTrigger?.kill();roverHandoff.kill();scienceHandoff.scrollTrigger?.kill();scienceHandoff.kill();marsJourney.scrollTrigger?.kill();marsJourney.kill();lrvLoadTrigger.kill();alsepLoadTrigger.kill();busFloat?.kill();earthSpin?.kill();moonSpin?.kill();marsSpin?.kill();
   scene.traverse(o=>{o.geometry?.dispose();if(o.material){const list=Array.isArray(o.material)?o.material:[o.material];list.forEach(m=>{Object.values(m).forEach(v=>{if(v?.isTexture)v.dispose();});m.dispose();});}});
   renderer.dispose();renderer.domElement.remove();
  }};
