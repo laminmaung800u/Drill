@@ -1313,3 +1313,47 @@ body.story3d-failed #scene3d-root{display:none}
 @media (prefers-reduced-motion: reduce) {
   #scene-04 { scroll-behavior: auto; }
 }
+
+
+/* CHAPTER 04 — narration captions, synchronized to lrv-narration.mp3 */
+#scene-04 .lrv-caption {
+  max-width: 570px;
+  margin: clamp(14px, 2.2vh, 24px) 0 20px;
+}
+#scene-04 .lrv-caption p {
+  margin: 0 0 10px;
+  color: rgba(245,244,238,.94);
+  font-size: clamp(13px, 1.12vw, 15px);
+  line-height: 1.48;
+  letter-spacing: .005em;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 650ms ease, transform 650ms ease;
+}
+#scene-04 .lrv-caption p.is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+#scene-04 .lrv-caption p:last-child {
+  color: #f1dfb9;
+  font-weight: 600;
+}
+#scene-04.scene3d-ready .lrv-caption { margin-top: 12px; margin-bottom: 16px; }
+@media (max-width: 900px) {
+  #scene-04 .lrv-caption { margin: 12px 0 14px; }
+  #scene-04 .lrv-caption p {
+    font-size: clamp(11px, 1.55vw, 14px);
+    line-height: 1.38;
+    margin-bottom: 7px;
+  }
+}
+@media (max-width: 620px) {
+  #scene-04 .lrv-caption p {
+    font-size: clamp(10px, 2.45vw, 12px);
+    line-height: 1.32;
+    margin-bottom: 5px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  #scene-04 .lrv-caption p { transition: none; transform: none; }
+}
