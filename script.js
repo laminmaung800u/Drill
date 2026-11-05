@@ -90,19 +90,23 @@ const objects = {
     // CHANGE NARRATION HERE
     audio: "assets/audio/lrv-narration.mp3",
 
-    mission: "[NASA DATA TO BE ADDED]",
-    landingYear: "[NASA DATA TO BE ADDED]",
-    purpose: "[NASA DATA TO BE ADDED]",
-    location: "[NASA DATA TO BE ADDED]",
-    latitude: "[NASA DATA TO BE ADDED]",
-    longitude: "[NASA DATA TO BE ADDED]",
-    mass: "[NASA DATA TO BE ADDED]",
-    instruments: "[NASA DATA TO BE ADDED]",
-    science: "[NASA DATA TO BE ADDED — VERIFY WITH NASA SOURCES]",
-    contribution: "[NASA DATA TO BE ADDED — VERIFY WITH NASA SOURCES]",
+    mission: "Apollo 15, Apollo 16 and Apollo 17",
+    landingYear: "1971–1972",
+    purpose: "Battery-powered crewed transport for lunar exploration",
+    location: "Hadley–Apennine region (Apollo 15 first use)",
+    latitude: "26.08° N",
+    longitude: "3.66° E",
+    mass: "About 210 kg (vehicle only)",
+    instruments: "Four wheel motors, navigation and communications systems; carried scientific tools and samples",
+    science: "Enabled astronauts to explore farther from the Lunar Module and investigate a wider range of lunar geology",
+    contribution: "Extended Apollo surface traverses; three rovers travelled on Apollo 15, 16 and 17",
 
-    // ADD NASA RESOURCE URL HERE
-    resources: ["[2026 NASA RESOURCE — INSERT WHEN AVAILABLE]"]
+    // Verified NASA resources
+    resources: [
+      "https://nssdc.gsfc.nasa.gov/planetary/lunar/apollo_lrv.html",
+      "https://www.nasa.gov/wp-content/uploads/static/apollo50th/pdf/A15_PressKit.pdf",
+      "https://www.nasa.gov/missions/apollo/apollo-15-mission-details/"
+    ]
   },
 
   alsep: {
@@ -1484,9 +1488,10 @@ async function initialize3DExperience() {
   const landingScene = document.getElementById("scene-01");
   const travelScene = document.getElementById("scene-02");
   const surfaceScene = document.getElementById("scene-03");
+  const lrvScene = document.getElementById("scene-04");
   const mount = document.getElementById("scene3d-root");
 
-  if (!landingScene || !travelScene || !surfaceScene || !mount || !window.gsap || !window.ScrollTrigger) return;
+  if (!landingScene || !travelScene || !surfaceScene || !lrvScene || !mount || !window.gsap || !window.ScrollTrigger) return;
 
   try {
     const module = await import("./scene3d.js");
@@ -1495,6 +1500,7 @@ async function initialize3DExperience() {
       landingScene,
       travelScene,
       surfaceScene,
+      lrvScene,
       gsap: window.gsap,
       ScrollTrigger: window.ScrollTrigger
     });
@@ -1509,7 +1515,8 @@ async function initialize3DExperience() {
     landingScene.classList.add("scene3d-failed");
     travelScene.classList.add("scene3d-failed");
     surfaceScene.classList.add("scene3d-failed");
+    lrvScene.classList.add("scene3d-failed");
     document.body.classList.add("story3d-failed");
-    console.warn("Shared Chapter 1–3 3D experience unavailable; retaining the original 2D scenes.", error);
+    console.warn("Shared Chapter 1–4 3D experience unavailable; retaining the original 2D scenes.", error);
   }
 }
