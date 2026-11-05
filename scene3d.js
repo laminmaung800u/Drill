@@ -6,8 +6,8 @@
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js";
 import { GLTFLoader } from "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/loaders/GLTFLoader.js";
 
-export async function createStoryExperience({mount,landingScene,travelScene,surfaceScene,gsap,ScrollTrigger}){
- if(!mount||!landingScene||!travelScene||!surfaceScene||!gsap||!ScrollTrigger)throw new Error("Missing 3D mount, story scenes or animation dependencies.");
+export async function createStoryExperience({mount,landingScene,travelScene,surfaceScene,lrvScene,gsap,ScrollTrigger}){
+ if(!mount||!landingScene||!travelScene||!surfaceScene||!lrvScene||!gsap||!ScrollTrigger)throw new Error("Missing 3D mount, story scenes or animation dependencies.");
  const reduced=matchMedia("(prefers-reduced-motion: reduce)").matches;
  const mobile=matchMedia("(max-width: 620px)").matches;
  const lowPower=(navigator.hardwareConcurrency||4)<=4;
@@ -397,6 +397,97 @@ export async function createStoryExperience({mount,landingScene,travelScene,surf
      surfaceScene.classList.add("scene3d-failed");
    }
  );
+
+ // CHAPTER 4 — APOLLO LUNAR ROVING VEHICLE
+ // Keep the Eagle and rover in the same lunar world; the rover is loaded
+ // shortly before Chapter 4 enters view to avoid downloading both large GLBs at once.
+ const lrvRoot=new THREE.Group();
+ lrvRoot.position.set(mobile?4.1:5.4,-2.13,-4.8);
+ lrvRoot.rotation.y=mobile?-.18:-.32;
+ lrvRoot.visible=false;
+ surfaceGroup.add(lrvRoot);
+ let lrvLoaded=false;
+ const lrvLoader=new GLTFLoader();
+ const loadLrvModel=()=>{
+   if(lrvLoaded||disposed)return;
+   lrvLoader.load(
+     "./assets/models/apollo-lunar-roving-vehicle.glb",
+     (gltf)=>{
+       if(disposed){
+         gltf.scene.traverse(o=>{
+           o.geometry?.dispose();
+           if(o.material)(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>{
+             Object.values(m).forEach(v=>{if(v?.isTexture)v.dispose();});
+             m.dispose();
+           });
+         });
+         return;
+       }
+       const model=gltf.scene;
+       const bounds=new THREE.Box3().setFromObject(model);
+       const center=bounds.getCenter(new THREE.Vector3());
+       const dimensions=bounds.getSize(new THREE.Vector3());
+       model.position.x-=center.x;
+       model.position.z-=center.z;
+       model.position.y-=bounds.min.y;
+       const horizontalSpan=Math.max(dimensions.x,dimensions.z);
+       const targetLength=mobile?2.85:4.15;
+       lrvRoot.scale.setScalar(targetLength/Math.max(horizontalSpan,.001));
+       model.traverse(object=>{
+         if(!object.isMesh)return;
+         object.castShadow=true;
+         object.receiveShadow=true;
+         if(Array.isArray(object.material)){
+           object.material.forEach(material=>{material.needsUpdate=true;});
+         }else if(object.material){
+           object.material.needsUpdate=true;
+         }
+       });
+       lrvRoot.add(model);
+       lrvRoot.visible=true;
+       lrvLoaded=true;
+       lrvScene.classList.add("scene3d-ready");
+       lrvScene.classList.remove("scene3d-failed");
+       ScrollTrigger.refresh();
+     },
+     (progress)=>{
+       if(progress.total>0){
+         mount.dataset.lrvLoadProgress=String(Math.round(progress.loaded/progress.total*100));
+       }
+     },
+     (error)=>{
+       console.error("Apollo Lunar Roving Vehicle GLB could not be loaded; retaining the original 2D LRV artwork.",error);
+       lrvScene.classList.add("scene3d-failed");
+     }
+   );
+ };
+ const lrvLoadTrigger=ScrollTrigger.create({
+   trigger:lrvScene,
+   start:"top 125%",
+   once:true,
+   onEnter:loadLrvModel
+ });
+
+ // A restrained veil of lunar regolith particles sweeps across the foreground
+ // during the handoff. It is a visual accent, not a simulated atmospheric plume.
+ const dustCount=mobile?110:190;
+ const dustPositions=new Float32Array(dustCount*3);
+ for(let i=0;i<dustCount;i++){
+   dustPositions[i*3]=(Math.random()-.5)*5.4;
+   dustPositions[i*3+1]=(Math.random()-.5)*.7;
+   dustPositions[i*3+2]=-2.8+Math.random()*3.2;
+ }
+ const dustGeometry=new THREE.BufferGeometry();
+ dustGeometry.setAttribute("position",new THREE.BufferAttribute(dustPositions,3));
+ const dustMaterial=new THREE.PointsMaterial({
+   color:0xc8b99d,size:mobile?.045:.055,transparent:true,opacity:0,
+   depthWrite:false,blending:THREE.AdditiveBlending
+ });
+ const dustSweep=new THREE.Group();
+ dustSweep.position.set(-5.2,-1.72,0);
+ dustSweep.add(new THREE.Points(dustGeometry,dustMaterial));
+ surfaceGroup.add(dustSweep);
+
  const lunarSun=new THREE.DirectionalLight(0xffe0b5,2.1);
  lunarSun.position.set(-8,11,7);lunarSun.castShadow=true;
  lunarSun.shadow.mapSize.set(1024,1024);
@@ -440,6 +531,22 @@ export async function createStoryExperience({mount,landingScene,travelScene,surf
    .to(camera.position,{x:mobile?-.05:-.32,y:mobile?1.48:1.58,z:mobile?8.15:8.35,duration:.58},.04)
    .to(camera.rotation,{x:-.105,y:0,z:0,duration:.58},.04);
 
+ // Chapter 4 — one continuous, scroll-scrubbed Eagle-to-LRV handoff.
+ // The lunar ground, star field, lighting and renderer remain untouched.
+ const roverHandoff=gsap.timeline({scrollTrigger:{
+   trigger:lrvScene,start:"top top",end:"bottom top",
+   scrub:1.05,invalidateOnRefresh:true
+ }});
+ roverHandoff
+   .to(eagleRoot.position,{x:mobile?-3.05:-4.15,y:-2.13,z:-7.5,duration:1},0)
+   .to(eagleRoot.scale,{x:eagleRoot.scale.x*.62,y:eagleRoot.scale.y*.62,z:eagleRoot.scale.z*.62,duration:1},0)
+   .to(lrvRoot.position,{x:mobile?-1.05:-1.45,y:-2.13,z:-4.55,duration:1},0)
+   .to(camera.position,{x:mobile?-.28:.22,y:mobile?1.55:1.64,z:mobile?8.1:8.0,duration:1},0)
+   .to(camera.rotation,{x:-.115,y:mobile?-.012:.018,z:0,duration:1},0)
+   .fromTo(dustSweep.position,{x:-5.2},{x:5.2,duration:.72,ease:"none"},.12)
+   .fromTo(dustMaterial,{opacity:0},{opacity:mobile?.17:.22,duration:.2},.15)
+   .to(dustMaterial,{opacity:0,duration:.34},.58);
+
  let busFloat=null,earthSpin=null,moonSpin=null;
  if(!reduced){
    busFloat=gsap.to(bus.rotation,{x:.018,duration:2.7,ease:"sine.inOut",yoyo:true,repeat:-1});
@@ -456,14 +563,14 @@ export async function createStoryExperience({mount,landingScene,travelScene,surf
    sceneVisible=visibleScenes.size>0;
    mount.classList.toggle("is-active",sceneVisible);
  },{threshold:.01});
- observer.observe(landingScene);observer.observe(travelScene);observer.observe(surfaceScene);
+ observer.observe(landingScene);observer.observe(travelScene);observer.observe(surfaceScene);observer.observe(lrvScene);
  const visibility=()=>{pageVisible=!document.hidden;if(pageVisible)last=0;};
  addEventListener("resize",resize,{passive:true});document.addEventListener("visibilitychange",visibility);resize();
  const render=time=>{if(disposed)return;raf=requestAnimationFrame(render);if(!pageVisible||!sceneVisible||time-last<33)return;last=time;stars.rotation.y+=reduced?0:.00012;renderer.render(scene,camera);};
  raf=requestAnimationFrame(render);
  return{dispose(){
   if(disposed)return;disposed=true;cancelAnimationFrame(raf);observer.disconnect();removeEventListener("resize",resize);document.removeEventListener("visibilitychange",visibility);
-  journey.scrollTrigger?.kill();journey.kill();arrival.scrollTrigger?.kill();arrival.kill();busFloat?.kill();earthSpin?.kill();moonSpin?.kill();
+  journey.scrollTrigger?.kill();journey.kill();arrival.scrollTrigger?.kill();arrival.kill();roverHandoff.scrollTrigger?.kill();roverHandoff.kill();lrvLoadTrigger.kill();busFloat?.kill();earthSpin?.kill();moonSpin?.kill();
   scene.traverse(o=>{o.geometry?.dispose();if(o.material){const list=Array.isArray(o.material)?o.material:[o.material];list.forEach(m=>{Object.values(m).forEach(v=>{if(v?.isTexture)v.dispose();});m.dispose();});}});
   renderer.dispose();renderer.domElement.remove();
  }};
