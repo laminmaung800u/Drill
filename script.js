@@ -1492,12 +1492,13 @@ let scene3DController = null;
 async function initialize3DExperience() {
   const landingScene = document.getElementById("scene-01");
   const travelScene = document.getElementById("scene-02");
+  const marsTravelScene = document.getElementById("scene-06");
   const surfaceScene = document.getElementById("scene-03");
   const lrvScene = document.getElementById("scene-04");
   const alsepScene = document.getElementById("scene-05");
   const mount = document.getElementById("scene3d-root");
 
-  if (!landingScene || !travelScene || !surfaceScene || !lrvScene || !alsepScene || !mount || !window.gsap || !window.ScrollTrigger) return;
+  if (!landingScene || !travelScene || !marsTravelScene || !surfaceScene || !lrvScene || !alsepScene || !mount || !window.gsap || !window.ScrollTrigger) return;
 
   try {
     const module = await import("./scene3d.js");
@@ -1505,6 +1506,7 @@ async function initialize3DExperience() {
       mount,
       landingScene,
       travelScene,
+      marsTravelScene,
       surfaceScene,
       lrvScene,
       alsepScene,
@@ -1515,16 +1517,18 @@ async function initialize3DExperience() {
     if (scene3DController) {
       landingScene.classList.add("scene3d-ready");
       travelScene.classList.add("scene3d-ready");
+      marsTravelScene.classList.add("scene3d-ready");
       // Chapter 3 is marked ready only after its GLB has actually loaded.
       document.body.classList.add("story3d-ready");
     }
   } catch (error) {
     landingScene.classList.add("scene3d-failed");
     travelScene.classList.add("scene3d-failed");
+    marsTravelScene.classList.add("scene3d-failed");
     surfaceScene.classList.add("scene3d-failed");
     lrvScene.classList.add("scene3d-failed");
     alsepScene.classList.add("scene3d-failed");
     document.body.classList.add("story3d-failed");
-    console.warn("Shared Chapter 1–5 3D experience unavailable; retaining the original 2D scenes.", error);
+    console.warn("Shared Chapter 1–6 3D experience unavailable; retaining the original 2D scenes.", error);
   }
 }
