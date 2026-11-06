@@ -701,7 +701,7 @@ function handleSceneEnter(sceneElement) {
   }
 }
 
-function handleSceneLeave(sceneElement) {
+function handleSceneLeave(sceneElement, leavingBack = false) {
   if (!sceneElement) return;
 
   const sceneId = sceneElement.id;
@@ -718,7 +718,7 @@ function handleSceneLeave(sceneElement) {
     preceding travel chapters. Forward transitions to another object
     chapter are handled by that next chapter's own enter callback.
   */
-  if (isBoundarySyncedScene && !isModalOpen) {
+  if (isBoundarySyncedScene && leavingBack && !isModalOpen) {
     AudioManager.stopNarration();
     return;
   }
@@ -1166,7 +1166,7 @@ function initializeScrollTrigger() {
       },
 
       onLeaveBack: () => {
-        handleSceneLeave(sceneElement);
+        handleSceneLeave(sceneElement, true);
       }
     });
 
