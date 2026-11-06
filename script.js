@@ -686,9 +686,11 @@ function handleSceneEnter(sceneElement) {
 
   if (sceneId === "scene-11") {
     activeObjectKey = null;
+    resetNarrationCaption("finalCaption");
 
     if (isAudioUnlocked && audioPaths.finalNarration) {
       AudioManager.playNarration(audioPaths.finalNarration);
+      connectNarrationCaptionToAudio(AudioManager.narration, "finalCaption", [0.02, 0.30, 0.66, 0.84]);
     }
   }
 }
@@ -1509,9 +1511,10 @@ async function initialize3DExperience() {
   const spiritScene = document.getElementById("scene-08");
   const insightScene = document.getElementById("scene-09");
   const returnScene = document.getElementById("scene-10");
+  const finalScene = document.getElementById("scene-11");
   const mount = document.getElementById("scene3d-root");
 
-  if (!landingScene || !travelScene || !marsTravelScene || !surfaceScene || !lrvScene || !alsepScene || !opportunityScene || !spiritScene || !insightScene || !returnScene || !mount || !window.gsap || !window.ScrollTrigger) return;
+  if (!landingScene || !travelScene || !marsTravelScene || !surfaceScene || !lrvScene || !alsepScene || !opportunityScene || !spiritScene || !insightScene || !returnScene || !finalScene || !mount || !window.gsap || !window.ScrollTrigger) return;
 
   try {
     const module = await import("./scene3d.js");
@@ -1527,6 +1530,7 @@ async function initialize3DExperience() {
       spiritScene,
       insightScene,
       returnScene,
+      finalScene,
       gsap: window.gsap,
       ScrollTrigger: window.ScrollTrigger
     });
@@ -1536,6 +1540,7 @@ async function initialize3DExperience() {
       travelScene.classList.add("scene3d-ready");
       marsTravelScene.classList.add("scene3d-ready");
       returnScene.classList.add("scene3d-ready");
+      finalScene.classList.add("scene3d-ready");
       // Chapter 3 is marked ready only after its GLB has actually loaded.
       document.body.classList.add("story3d-ready");
     }
@@ -1550,6 +1555,7 @@ async function initialize3DExperience() {
     spiritScene.classList.add("scene3d-failed");
     insightScene.classList.add("scene3d-failed");
     returnScene.classList.add("scene3d-failed");
+    finalScene.classList.add("scene3d-failed");
     document.body.classList.add("story3d-failed");
     console.warn("Shared 3D experience unavailable; retaining the original 2D scenes.", error);
   }
