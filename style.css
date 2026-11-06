@@ -1481,6 +1481,19 @@ body.story3d-failed #scene3d-root{display:none}
 }
 
 
+/* CHAPTER 06 — EXTENDED MARSBOUND FLIGHT
+   Add one quarter-viewport of scroll distance so BUSSY has more time
+   to approach the 3D Mars globe. Keep the foreground copy within the
+   original viewport instead of stretching it with the section. */
+#scene-06 {
+  min-height: 125svh;
+  height: 125svh;
+}
+
+#scene-06 .scene-content {
+  height: 100svh;
+}
+
 /* ============================================================
    CHAPTER 06 — 3D MARS APPROACH
    Keep the chapter copy and engine audio; the shared Three.js
