@@ -656,6 +656,9 @@ function handleSceneEnter(sceneElement) {
       } else if (objectKey === "spirit") {
         resetNarrationCaption("spiritCaption");
         connectNarrationCaptionToAudio(AudioManager.narration, "spiritCaption", [0.02, 0.22, 0.48, 0.72, 0.90]);
+      } else if (objectKey === "insight") {
+        resetNarrationCaption("insightCaption");
+        connectNarrationCaptionToAudio(AudioManager.narration, "insightCaption", [0.02, 0.28, 0.66, 0.88]);
       }
     }
 
@@ -1504,9 +1507,10 @@ async function initialize3DExperience() {
   const alsepScene = document.getElementById("scene-05");
   const opportunityScene = document.getElementById("scene-07");
   const spiritScene = document.getElementById("scene-08");
+  const insightScene = document.getElementById("scene-09");
   const mount = document.getElementById("scene3d-root");
 
-  if (!landingScene || !travelScene || !marsTravelScene || !surfaceScene || !lrvScene || !alsepScene || !opportunityScene || !spiritScene || !mount || !window.gsap || !window.ScrollTrigger) return;
+  if (!landingScene || !travelScene || !marsTravelScene || !surfaceScene || !lrvScene || !alsepScene || !opportunityScene || !spiritScene || !insightScene || !mount || !window.gsap || !window.ScrollTrigger) return;
 
   try {
     const module = await import("./scene3d.js");
@@ -1520,6 +1524,7 @@ async function initialize3DExperience() {
       alsepScene,
       opportunityScene,
       spiritScene,
+      insightScene,
       gsap: window.gsap,
       ScrollTrigger: window.ScrollTrigger
     });
@@ -1540,7 +1545,8 @@ async function initialize3DExperience() {
     alsepScene.classList.add("scene3d-failed");
     opportunityScene.classList.add("scene3d-failed");
     spiritScene.classList.add("scene3d-failed");
+    insightScene.classList.add("scene3d-failed");
     document.body.classList.add("story3d-failed");
-    console.warn("Shared Chapter 1–7 3D experience unavailable; retaining the original 2D scenes.", error);
+    console.warn("Shared 3D experience unavailable; retaining the original 2D scenes.", error);
   }
 }
