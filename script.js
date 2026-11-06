@@ -608,6 +608,12 @@ function handleSceneEnter(sceneElement) {
 
   updateChapterIndicator(sceneElement);
 
+  // Chapters 3 and 7 reveal their narration UI only after their own
+  // section reaches the top of the viewport.
+  if (sceneElement.id === "scene-03" || sceneElement.id === "scene-07") {
+    sceneElement.classList.add("chapter-activated");
+  }
+
   const objectKey = getObjectKeyFromScene(sceneElement);
   activeObjectKey = objectKey;
 
@@ -698,11 +704,25 @@ function handleSceneEnter(sceneElement) {
 function handleSceneLeave(sceneElement) {
   if (!sceneElement) return;
 
+  const sceneId = sceneElement.id;
+  const isBoundarySyncedScene = sceneId === "scene-03" || sceneId === "scene-07";
+
+  if (isBoundarySyncedScene) {
+    sceneElement.classList.remove("chapter-activated");
+    resetNarrationCaption(sceneId === "scene-03" ? "eagleCaption" : "opportunityCaption");
+  }
+
   /*
-    The active scene normally takes over the audio. We only need
-    to explicitly clean up when an object scene is left and the
-    visitor moves into a non-object scene.
+    The active scene normally takes over the audio. We explicitly
+    stop narration when leaving Chapters 3 or 7 backwards into their
+    preceding travel chapters. Forward transitions to another object
+    chapter are handled by that next chapter's own enter callback.
   */
+  if (isBoundarySyncedScene && !isModalOpen) {
+    AudioManager.stopNarration();
+    return;
+  }
+
   if (getObjectKeyFromScene(sceneElement) && !isModalOpen) {
     const nextScene = sceneElement.nextElementSibling;
 
@@ -1123,10 +1143,15 @@ function initializeScrollTrigger() {
     no duplicated ScrollTrigger code for individual characters.
   */
   sceneList.forEach((sceneElement) => {
+    const isBoundarySyncedScene =
+      sceneElement.id === "scene-03" || sceneElement.id === "scene-07";
+
     ScrollTrigger.create({
       trigger: sceneElement,
-      start: "top 62%",
-      end: "bottom 38%",
+      // Chapters 3 and 7 activate only when their own page reaches
+      // the top; all other chapters retain their existing timing.
+      start: isBoundarySyncedScene ? "top top" : "top 62%",
+      end: isBoundarySyncedScene ? "bottom top" : "bottom 38%",
 
       onEnter: () => {
         handleSceneEnter(sceneElement);
