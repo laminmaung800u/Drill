@@ -869,12 +869,8 @@ export async function createStoryExperience({mount,landingScene,travelScene,mars
   .to(marsGroup.scale,{x:.001,y:.001,z:.001,duration:.28},0)
   .to(earthGroup.position,{x:mobile?2.35:3.45,y:mobile?.15:.1,z:-3.5,duration:.72},.12)
   .to(earthGroup.scale,{x:mobile?.68:.92,y:mobile?.68:.92,z:mobile?.68:.92,duration:.72},.12)
-  .fromTo(bus.position,
-   {x:mobile?-2.55:-3.05,y:.28,z:.85},
-   {x:mobile?.65:.9,y:mobile?.22:.28,z:.45,duration:.9,ease:"none"},0)
-  .fromTo(bus.scale,
-   {x:.001,y:.001,z:.001},
-   {x:mobile?.56:.68,y:mobile?.56:.68,z:mobile?.56:.68,duration:.48},0)
+  .to(bus.position,{x:mobile?.65:.9,y:mobile?.22:.28,z:.45,duration:.9,ease:"none"},0)
+  .to(bus.scale,{x:mobile?.56:.68,y:mobile?.56:.68,z:mobile?.56:.68,duration:.48},0)
   .to(bus.rotation,{x:0,y:-.12,z:-.015,duration:.82},.08)
   .to(camera.position,{x:mobile?.12:.2,y:mobile?-.05:.02,z:mobile?10.7:10.9,duration:.42},.58);
 
