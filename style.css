@@ -1571,3 +1571,58 @@ body.story3d-failed #scene3d-root{display:none}
 @media(prefers-reduced-motion:reduce) {
   #scene-08 .spirit-caption p { transition:none; transform:none; }
 }
+
+
+/* CHAPTER 09 — INSIGHT JOINS OPPORTUNITY AND SPIRIT ON MARS */
+#scene-09 { min-height:125svh; height:125svh; }
+#scene-09 .scene-content { height:100svh; }
+#scene-09.scene3d-ready .background-layer,
+#scene-09.scene3d-ready .mars-horizon,
+#scene-09.scene3d-ready .particle-field { display:none!important; }
+#scene-09.scene3d-ready .character-stage { display:none!important; }
+#scene-09.scene3d-ready .scene-content {
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+}
+#scene-09.scene3d-ready .object-copy {
+  width:min(48%,590px);
+  max-width:590px;
+  padding:clamp(18px,3vh,38px) 0;
+  text-shadow:0 2px 18px rgba(0,0,0,.78);
+}
+#scene-09.scene3d-ready .scene-title { font-size:clamp(34px,4.7vw,62px); }
+#scene-09.scene3d-ready .object-tagline { margin-bottom:0; }
+#scene-09.scene3d-ready .read-about-button { margin-top:2px; }
+#scene-09 .insight-caption { max-width:570px; margin:clamp(14px,2.2vh,24px) 0 20px; }
+#scene-09 .insight-caption p {
+  margin:0 0 10px;
+  color:rgba(245,244,238,.94);
+  font-size:clamp(13px,1.12vw,15px);
+  line-height:1.48;
+  letter-spacing:.005em;
+  opacity:0;
+  transform:translateY(12px);
+  transition:opacity 650ms ease,transform 650ms ease;
+}
+#scene-09 .insight-caption p.is-revealed { opacity:1; transform:translateY(0); }
+#scene-09 .insight-caption p:last-child { color:#f1dfb9; font-weight:600; }
+@media(max-width:900px) {
+  #scene-09 .scene-content { height:100svh; }
+  #scene-09.scene3d-ready .scene-content { display:block; width:calc(100% - 34px); padding-top:clamp(82px,12vh,116px); }
+  #scene-09.scene3d-ready .object-copy { width:min(64%,470px); max-width:470px; margin-left:auto; padding:0; }
+  #scene-09.scene3d-ready .scene-title { font-size:clamp(28px,5.6vw,44px); }
+  #scene-09 .insight-caption { margin:12px 0 14px; }
+  #scene-09 .insight-caption p { font-size:clamp(11px,1.55vw,14px); line-height:1.38; margin-bottom:7px; }
+}
+@media(max-width:620px) {
+  #scene-09.scene3d-ready .scene-content { width:calc(100% - 28px); padding-top:76px; }
+  #scene-09.scene3d-ready .object-copy { width:min(72%,390px); }
+  #scene-09.scene3d-ready .scene-title { font-size:clamp(24px,6.1vw,34px); }
+  #scene-09.scene3d-ready .eyebrow { font-size:8px; }
+  #scene-09.scene3d-ready .read-about-button { padding:11px 14px; font-size:9px; }
+  #scene-09 .insight-caption p { font-size:clamp(10px,2.45vw,12px); line-height:1.32; margin-bottom:5px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  #scene-09 .insight-caption p { transition:none; transform:none; }
+}
