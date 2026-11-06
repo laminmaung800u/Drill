@@ -916,10 +916,19 @@ export async function createStoryExperience({mount,landingScene,travelScene,mars
  // normalized positions keep the Moonbound flight beginning exactly
  // at the Chapter 2 boundary and distribute its motion across the
  // chapter's longer scroll distance.
- const journey=gsap.timeline({scrollTrigger:{
+ const journey=gsap.timeline({
+  scrollTrigger:{
    trigger:landingScene,start:"top top",endTrigger:travelScene,end:"bottom top",
    scrub:1.15,invalidateOnRefresh:true
- }});
+  },
+  onUpdate:()=>{
+   // The Earth and Moon belong to the opening journey; restore them when
+   // scrolling back from the later chapters.
+   earthGroup.visible=true;
+   moonGroup.visible=true;
+   bus.visible=true;
+  }
+ });
  journey
    .to(camera.position,{x:mobile?0:.18,y:mobile?.08:.1,z:7.75,duration:1},0)
    .to(earthGroup.position,{x:mobile?-4.1:-6.25,y:mobile?1.25:1.05,duration:4/9},0)
@@ -985,6 +994,10 @@ export async function createStoryExperience({mount,landingScene,travelScene,mars
  const opportunityArrival=gsap.timeline({
   scrollTrigger:{trigger:opportunityScene,start:"top top",end:"bottom top",scrub:1.05,invalidateOnRefresh:true},
   onUpdate:()=>{
+    // During landing, keep the transport globes out of the surface scene.
+    earthGroup.visible=false;
+    moonGroup.visible=false;
+    bus.visible=opportunityArrival.progress()<.22;
     // Keep the distant Mars globe visible during the approach, then remove it
     // completely once the landing transition has finished. Reverse scrolling restores it.
     marsGroup.visible=opportunityArrival.progress()<.38;
@@ -1000,9 +1013,16 @@ export async function createStoryExperience({mount,landingScene,travelScene,mars
   .to(opportunityRoot.position,{x:mobile?-.2:-.65,y:-2.13,z:-4.9,duration:.62},.12);
 
  // Chapter 8 keeps the Mars world and Opportunity in view, then brings Spirit alongside.
- const spiritArrival=gsap.timeline({scrollTrigger:{
-  trigger:spiritScene,start:"top top",end:"bottom top",scrub:1.05,invalidateOnRefresh:true
- }});
+ const spiritArrival=gsap.timeline({
+  scrollTrigger:{trigger:spiritScene,start:"top top",end:"bottom top",scrub:1.05,invalidateOnRefresh:true},
+  onUpdate:()=>{
+   // Chapters 8–9 show only the Martian surface, sky and landed hardware.
+   bus.visible=false;
+   earthGroup.visible=false;
+   moonGroup.visible=false;
+   marsGroup.visible=false;
+  }
+ });
  spiritArrival
   .to(opportunityRoot.position,{x:mobile?-1.05:-1.55,y:-2.13,z:-4.9,duration:.72},0)
   .to(spiritRoot.position,{x:mobile?1.15:1.65,y:-2.13,z:-5.05,duration:.72},0)
@@ -1010,9 +1030,16 @@ export async function createStoryExperience({mount,landingScene,travelScene,mars
   .to(camera.rotation,{x:-.105,y:0,z:0,duration:.72},0);
 
  // Chapter 9 — keep both rovers in view while InSight joins the Martian scene.
- const insightArrival=gsap.timeline({scrollTrigger:{
-  trigger:insightScene,start:"top top",end:"bottom top",scrub:1.05,invalidateOnRefresh:true
- }});
+ const insightArrival=gsap.timeline({
+  scrollTrigger:{trigger:insightScene,start:"top top",end:"bottom top",scrub:1.05,invalidateOnRefresh:true},
+  onUpdate:()=>{
+   // Reassert the clean Martian-surface composition throughout Chapter 9.
+   bus.visible=false;
+   earthGroup.visible=false;
+   moonGroup.visible=false;
+   marsGroup.visible=false;
+  }
+ });
  insightArrival
   .to(opportunityRoot.position,{x:mobile?-2.0:-2.45,y:-2.13,z:-4.9,duration:.72},0)
   .to(spiritRoot.position,{x:mobile?-.15:.15,y:-2.13,z:-5.05,duration:.72},0)
@@ -1023,9 +1050,16 @@ export async function createStoryExperience({mount,landingScene,travelScene,mars
  // CHAPTER 10 — pull back from Mars and begin the journey home.
  // Reuse the same 3D bus, starfield and procedural Earth from Chapters 1–2.
  // The Mars landscape and all three explorers recede as the camera returns to space.
- const returnJourney=gsap.timeline({scrollTrigger:{
-  trigger:returnScene,start:"top top",end:"bottom top",scrub:1.15,invalidateOnRefresh:true
- }});
+ const returnJourney=gsap.timeline({
+  scrollTrigger:{trigger:returnScene,start:"top top",end:"bottom top",scrub:1.15,invalidateOnRefresh:true},
+  onUpdate:()=>{
+   const returning=returnJourney.progress()>0;
+   bus.visible=returning;
+   earthGroup.visible=returning;
+   moonGroup.visible=false;
+   marsGroup.visible=false;
+  }
+ });
  returnJourney
   .to(camera.position,{x:0,y:0,z:11.6,duration:.34},0)
   .to(camera.rotation,{x:0,y:0,z:0,duration:.34},0)
@@ -1063,10 +1097,17 @@ export async function createStoryExperience({mount,landingScene,travelScene,mars
  // CHAPTER 6 — transition from the lunar surface into a Mars-bound flight.
   // Reuse the exact 3D bus and star field already built for Chapters 1–2.
   // The Chapter 6 engine sound remains managed independently by script.js.
-  const marsJourney=gsap.timeline({scrollTrigger:{
-    trigger:marsTravelScene,start:"top top",end:"bottom top",
-    scrub:1.1,invalidateOnRefresh:true
-  }});
+  const marsJourney=gsap.timeline({
+    scrollTrigger:{trigger:marsTravelScene,start:"top top",end:"bottom top",scrub:1.1,invalidateOnRefresh:true},
+    onUpdate:()=>{
+      const travelling=marsJourney.progress()>0;
+      // Restore the bus, Moon and Mars globe only for the Mars-bound flight.
+      bus.visible=travelling;
+      moonGroup.visible=travelling;
+      marsGroup.visible=travelling;
+      earthGroup.visible=false;
+    }
+  });
   marsJourney
     .to(surfaceGroup.scale,{x:.001,y:.001,z:.001,duration:.24},0)
     .to(camera.position,{x:0,y:0,z:8.6,duration:.42},0)
