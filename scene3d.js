@@ -378,6 +378,90 @@ export async function createStoryExperience({mount,landingScene,travelScene,mars
    bloom.position.set(x,-1.89,z);homecoming.add(bloom);
  }
 
+ // Add a fully modeled school campus behind BUSSY. The front entrance faces
+ // the road, so the bus appears to have arrived at its destination.
+ const schoolCampus=new THREE.Group();
+ schoolCampus.position.set(0,-2.2,-32);
+ homecoming.add(schoolCampus);
+
+ const schoolWall=mat(0xf1dfb9,.92),schoolTrim=mat(0xf7f0dc,.8);
+ const schoolRoof=mat(0xc65b48,.86),schoolGlass=mat(0x75c9e8,.3,.08);
+ const schoolDoor=mat(0x315b72,.65),schoolFrame=mat(0xfff3d6,.8);
+ makeBox(schoolCampus,18,5.2,4.6,schoolWall,0,2.6,0);
+ makeBox(schoolCampus,18.5,.28,4.9,schoolTrim,0,5.18,0);
+
+ // A simple gabled roof gives the building a recognizable school silhouette.
+ const roofShape=new THREE.Shape();
+ roofShape.moveTo(-9.35,0);
+ roofShape.lineTo(0,2.35);
+ roofShape.lineTo(9.35,0);
+ roofShape.closePath();
+ const roofGeometry=new THREE.ExtrudeGeometry(roofShape,{depth:4.95,bevelEnabled:false,steps:1});
+ roofGeometry.translate(0,0,-2.475);
+ const roofMesh=new THREE.Mesh(roofGeometry,schoolRoof);
+ roofMesh.position.y=5.28;
+ roofMesh.castShadow=true;
+ schoolCampus.add(roofMesh);
+
+ // Front windows, frames and the central entrance.
+ for(const x of [-6.7,-3.7,3.7,6.7]){
+   makeBox(schoolCampus,1.95,1.55,.16,schoolFrame,x,3.55,2.34);
+   makeBox(schoolCampus,1.68,1.28,.08,schoolGlass,x,3.55,2.445);
+   makeBox(schoolCampus,.07,1.3,.1,schoolFrame,x,3.55,2.5);
+   makeBox(schoolCampus,1.7,.07,.1,schoolFrame,x,3.55,2.5);
+ }
+ makeBox(schoolCampus,2.05,2.65,.2,schoolTrim,0,1.32,2.36);
+ makeBox(schoolCampus,1.72,2.38,.12,schoolDoor,0,1.25,2.49);
+ makeBox(schoolCampus,.12,.12,.16,schoolFrame,.62,1.2,2.57);
+ makeBox(schoolCampus,3.25,.28,1.35,schoolTrim,0,.14,3.02);
+ makeBox(schoolCampus,2.55,.22,.9,schoolFrame,0,.36,2.82);
+
+ // A readable sign is painted onto a small 3D board above the entrance.
+ const schoolSignCanvas=document.createElement("canvas");
+ schoolSignCanvas.width=768;schoolSignCanvas.height=128;
+ const schoolSignCtx=schoolSignCanvas.getContext("2d");
+ schoolSignCtx.fillStyle="#244b63";
+ schoolSignCtx.fillRect(0,0,768,128);
+ schoolSignCtx.fillStyle="#fff3d6";
+ schoolSignCtx.font="bold 66px Arial";
+ schoolSignCtx.textAlign="center";
+ schoolSignCtx.textBaseline="middle";
+ schoolSignCtx.fillText("OUR SCHOOL",384,66);
+ const schoolSignTexture=new THREE.CanvasTexture(schoolSignCanvas);
+ schoolSignTexture.colorSpace=THREE.SRGBColorSpace;
+ const schoolSign=new THREE.Mesh(
+   new THREE.PlaneGeometry(5.7,.9),
+   new THREE.MeshBasicMaterial({map:schoolSignTexture})
+ );
+ schoolSign.position.set(0,4.55,2.49);
+ schoolCampus.add(schoolSign);
+
+ // Flagpole and a small bright flag at the front corner.
+ const pole=new THREE.Mesh(new THREE.CylinderGeometry(.045,.06,6.2,10),schoolFrame);
+ pole.position.set(-9.9,3.1,1.1);
+ schoolCampus.add(pole);
+ const flagShape=new THREE.Shape();
+ flagShape.moveTo(0,0);flagShape.lineTo(1.7,-.15);flagShape.lineTo(0,-.85);flagShape.closePath();
+ const flag=new THREE.Mesh(new THREE.ShapeGeometry(flagShape),mat(0xe85b50,.8));
+ flag.position.set(-9.88,5.8,1.15);
+ schoolCampus.add(flag);
+
+ // Trees frame the campus without hiding the building or road.
+ const trunkMaterial=mat(0x805536,1),leafMaterials=[mat(0x4e9149,1),mat(0x68aa55,1),mat(0x82bd62,1)];
+ for(const side of [-1,1]){
+   for(let i=0;i<2;i++){
+     const tree=new THREE.Group();
+     tree.position.set(side*(11.2+i*2.2),0,-27-i*5);
+     const trunk=new THREE.Mesh(new THREE.CylinderGeometry(.2,.3,2.8,9),trunkMaterial);
+     trunk.position.y=1.4;tree.add(trunk);
+     [[0,3.5,0,1.55],[.75,4.05,.1,1.05],[-.7,4.0,-.1,1.05]].forEach(([x,y,z,r],j)=>{
+       const crown=new THREE.Mesh(new THREE.SphereGeometry(r,12,9),leafMaterials[(i+j)%leafMaterials.length]);
+       crown.position.set(x,y,z);crown.scale.y=1.12;tree.add(crown);
+     });
+     schoolCampus.add(tree);
+   }
+ }
+
  // Park BUSSY on the road, facing the viewer, and stop its in-flight bob.
 
 
