@@ -1762,3 +1762,39 @@ body.story3d-failed #scene3d-root{display:none}
 @media(prefers-reduced-motion:reduce) {
   .final-narration p { transition: none; transform: none; }
 }
+
+/* CHAPTER 03 + 07 — KEEP NARRATION UI INSIDE ITS OWN CHAPTER
+   The audio/caption activation is tied to the chapter's top boundary
+   in script.js. Keep the captions and information buttons hidden until
+   that boundary is reached, including while the previous chapter is visible. */
+#scene-03:not(.chapter-activated) .eagle-caption,
+#scene-07:not(.chapter-activated) .opportunity-caption {
+  visibility: hidden;
+  opacity: 0;
+}
+
+#scene-03.chapter-activated .eagle-caption,
+#scene-07.chapter-activated .opportunity-caption {
+  visibility: visible;
+  opacity: 1;
+}
+
+#scene-03 .read-about-button,
+#scene-07 .read-about-button {
+  transition: opacity 250ms ease, visibility 0s linear 250ms;
+}
+
+#scene-03:not(.chapter-activated) .read-about-button,
+#scene-07:not(.chapter-activated) .read-about-button {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+#scene-03.chapter-activated .read-about-button,
+#scene-07.chapter-activated .read-about-button {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity 250ms ease, visibility 0s;
+}
