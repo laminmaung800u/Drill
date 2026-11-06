@@ -650,6 +650,9 @@ function handleSceneEnter(sceneElement) {
       } else if (objectKey === "alsep") {
         resetNarrationCaption("alsepCaption");
         connectNarrationCaptionToAudio(AudioManager.narration, "alsepCaption", [0.02, 0.20, 0.48, 0.68, 0.86]);
+      } else if (objectKey === "opportunity") {
+        resetNarrationCaption("opportunityCaption");
+        connectNarrationCaptionToAudio(AudioManager.narration, "opportunityCaption", [0.02, 0.20, 0.43, 0.68, 0.86]);
       }
     }
 
@@ -1496,9 +1499,10 @@ async function initialize3DExperience() {
   const surfaceScene = document.getElementById("scene-03");
   const lrvScene = document.getElementById("scene-04");
   const alsepScene = document.getElementById("scene-05");
+  const opportunityScene = document.getElementById("scene-07");
   const mount = document.getElementById("scene3d-root");
 
-  if (!landingScene || !travelScene || !marsTravelScene || !surfaceScene || !lrvScene || !alsepScene || !mount || !window.gsap || !window.ScrollTrigger) return;
+  if (!landingScene || !travelScene || !marsTravelScene || !surfaceScene || !lrvScene || !alsepScene || !opportunityScene || !mount || !window.gsap || !window.ScrollTrigger) return;
 
   try {
     const module = await import("./scene3d.js");
@@ -1529,6 +1533,6 @@ async function initialize3DExperience() {
     lrvScene.classList.add("scene3d-failed");
     alsepScene.classList.add("scene3d-failed");
     document.body.classList.add("story3d-failed");
-    console.warn("Shared Chapter 1–6 3D experience unavailable; retaining the original 2D scenes.", error);
+    console.warn("Shared Chapter 1–7 3D experience unavailable; retaining the original 2D scenes.", error);
   }
 }
