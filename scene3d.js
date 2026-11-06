@@ -6,8 +6,8 @@
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js";
 import { GLTFLoader } from "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/loaders/GLTFLoader.js";
 
-export async function createStoryExperience({mount,landingScene,travelScene,marsTravelScene,surfaceScene,lrvScene,alsepScene,opportunityScene,spiritScene,gsap,ScrollTrigger}){
- if(!mount||!landingScene||!travelScene||!marsTravelScene||!surfaceScene||!lrvScene||!alsepScene||!opportunityScene||!spiritScene||!gsap||!ScrollTrigger)throw new Error("Missing 3D mount, story scenes or animation dependencies.");
+export async function createStoryExperience({mount,landingScene,travelScene,marsTravelScene,surfaceScene,lrvScene,alsepScene,opportunityScene,spiritScene,insightScene,gsap,ScrollTrigger}){
+ if(!mount||!landingScene||!travelScene||!marsTravelScene||!surfaceScene||!lrvScene||!alsepScene||!opportunityScene||!spiritScene||!insightScene||!gsap||!ScrollTrigger)throw new Error("Missing 3D mount, story scenes or animation dependencies.");
  const reduced=matchMedia("(prefers-reduced-motion: reduce)").matches;
  const mobile=matchMedia("(max-width: 620px)").matches;
  const lowPower=(navigator.hardwareConcurrency||4)<=4;
@@ -670,6 +670,61 @@ export async function createStoryExperience({mount,landingScene,travelScene,mars
  };
  const spiritLoadTrigger=ScrollTrigger.create({trigger:spiritScene,start:"top 125%",once:true,onEnter:loadSpiritModel});
 
+ // CHAPTER 9 — add the InSight lander beside both Mars rovers.
+ // Opportunity and Spirit remain in the shared landscape; InSight joins as a third explorer.
+ const insightRoot=new THREE.Group();
+ insightRoot.position.set(mobile?5.2:6.2,-2.13,-5.25);
+ insightRoot.rotation.y=mobile?-.08:-.12;
+ insightRoot.visible=false;
+ marsSurfaceGroup.add(insightRoot);
+ let insightLoaded=false;
+ const insightLoader=new GLTFLoader();
+ const loadInsightModel=()=>{
+  if(insightLoaded||disposed)return;
+  insightLoader.load("./assets/models/insight-lander.glb",gltf=>{
+   if(disposed){
+    gltf.scene.traverse(o=>{
+     o.geometry?.dispose();
+     if(o.material)(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>{
+      Object.values(m).forEach(v=>{if(v?.isTexture)v.dispose();});
+      m.dispose();
+     });
+    });
+    return;
+   }
+   const model=gltf.scene;
+   const bounds=new THREE.Box3().setFromObject(model);
+   const center=bounds.getCenter(new THREE.Vector3());
+   const dimensions=bounds.getSize(new THREE.Vector3());
+   model.position.x-=center.x;
+   model.position.z-=center.z;
+   model.position.y-=bounds.min.y;
+   const horizontalSpan=Math.max(dimensions.x,dimensions.z);
+   const targetLength=mobile?1.9:2.45;
+   insightRoot.scale.setScalar(targetLength/Math.max(horizontalSpan,.001));
+   model.traverse(object=>{
+    if(!object.isMesh)return;
+    object.castShadow=true;
+    object.receiveShadow=true;
+    if(Array.isArray(object.material))object.material.forEach(material=>{material.needsUpdate=true;});
+    else if(object.material)object.material.needsUpdate=true;
+   });
+   insightRoot.add(model);
+   // Keep the parent hidden until the GLB is fully loaded, then reveal it explicitly.
+   insightRoot.visible=true;
+   insightLoaded=true;
+   insightScene.classList.add("scene3d-ready");
+   insightScene.classList.remove("scene3d-failed");
+   ScrollTrigger.refresh();
+  },progress=>{
+   if(progress.total>0)mount.dataset.insightLoadProgress=String(Math.round(progress.loaded/progress.total*100));
+  },error=>{
+   console.error("InSight lander GLB could not be loaded; retaining the original 2D InSight artwork.",error);
+   insightScene.classList.add("scene3d-failed");
+  });
+ };
+ const insightLoadTrigger=ScrollTrigger.create({trigger:insightScene,start:"top 125%",once:true,onEnter:loadInsightModel});
+
  const dustCount=mobile?110:190;
  const dustPositions=new Float32Array(dustCount*3);
  for(let i=0;i<dustCount;i++){
@@ -790,6 +845,17 @@ export async function createStoryExperience({mount,landingScene,travelScene,mars
   .to(camera.position,{x:mobile?-.05:-.12,y:mobile?1.5:1.58,z:mobile?8.2:8.35,duration:.72},0)
   .to(camera.rotation,{x:-.105,y:0,z:0,duration:.72},0);
 
+ // Chapter 9 — keep both rovers in view while InSight joins the Martian scene.
+ const insightArrival=gsap.timeline({scrollTrigger:{
+  trigger:insightScene,start:"top top",end:"bottom top",scrub:1.05,invalidateOnRefresh:true
+ }});
+ insightArrival
+  .to(opportunityRoot.position,{x:mobile?-2.0:-2.45,y:-2.13,z:-4.9,duration:.72},0)
+  .to(spiritRoot.position,{x:mobile?-.15:.15,y:-2.13,z:-5.05,duration:.72},0)
+  .to(insightRoot.position,{x:mobile?2.25:2.85,y:-2.13,z:-5.25,duration:.72},0)
+  .to(camera.position,{x:mobile?-.05:-.08,y:mobile?1.5:1.58,z:mobile?8.2:8.35,duration:.72},0)
+  .to(camera.rotation,{x:-.105,y:0,z:0,duration:.72},0);
+
  // CHAPTER 6 — transition from the lunar surface into a Mars-bound flight.
   // Reuse the exact 3D bus and star field already built for Chapters 1–2.
   // The Chapter 6 engine sound remains managed independently by script.js.
@@ -829,14 +895,14 @@ export async function createStoryExperience({mount,landingScene,travelScene,mars
    sceneVisible=visibleScenes.size>0;
    mount.classList.toggle("is-active",sceneVisible);
  },{threshold:.01});
- observer.observe(landingScene);observer.observe(travelScene);observer.observe(marsTravelScene);observer.observe(surfaceScene);observer.observe(lrvScene);observer.observe(alsepScene);observer.observe(opportunityScene);observer.observe(spiritScene);
+ observer.observe(landingScene);observer.observe(travelScene);observer.observe(marsTravelScene);observer.observe(surfaceScene);observer.observe(lrvScene);observer.observe(alsepScene);observer.observe(opportunityScene);observer.observe(spiritScene);observer.observe(insightScene);
  const visibility=()=>{pageVisible=!document.hidden;if(pageVisible)last=0;};
  addEventListener("resize",resize,{passive:true});document.addEventListener("visibilitychange",visibility);resize();
  const render=time=>{if(disposed)return;raf=requestAnimationFrame(render);if(!pageVisible||!sceneVisible||time-last<33)return;last=time;stars.rotation.y+=reduced?0:.00012;renderer.render(scene,camera);};
  raf=requestAnimationFrame(render);
  return{dispose(){
   if(disposed)return;disposed=true;cancelAnimationFrame(raf);observer.disconnect();removeEventListener("resize",resize);document.removeEventListener("visibilitychange",visibility);
-  journey.scrollTrigger?.kill();journey.kill();arrival.scrollTrigger?.kill();arrival.kill();roverHandoff.scrollTrigger?.kill();roverHandoff.kill();scienceHandoff.scrollTrigger?.kill();scienceHandoff.kill();marsJourney.scrollTrigger?.kill();marsJourney.kill();opportunityArrival.scrollTrigger?.kill();opportunityArrival.kill();spiritArrival.scrollTrigger?.kill();spiritArrival.kill();lrvLoadTrigger.kill();alsepLoadTrigger.kill();opportunityLoadTrigger.kill();spiritLoadTrigger.kill();busFloat?.kill();earthSpin?.kill();moonSpin?.kill();marsSpin?.kill();
+  journey.scrollTrigger?.kill();journey.kill();arrival.scrollTrigger?.kill();arrival.kill();roverHandoff.scrollTrigger?.kill();roverHandoff.kill();scienceHandoff.scrollTrigger?.kill();scienceHandoff.kill();marsJourney.scrollTrigger?.kill();marsJourney.kill();opportunityArrival.scrollTrigger?.kill();opportunityArrival.kill();spiritArrival.scrollTrigger?.kill();spiritArrival.kill();insightArrival.scrollTrigger?.kill();insightArrival.kill();lrvLoadTrigger.kill();alsepLoadTrigger.kill();opportunityLoadTrigger.kill();spiritLoadTrigger.kill();insightLoadTrigger.kill();busFloat?.kill();earthSpin?.kill();moonSpin?.kill();marsSpin?.kill();
   scene.traverse(o=>{o.geometry?.dispose();if(o.material){const list=Array.isArray(o.material)?o.material:[o.material];list.forEach(m=>{Object.values(m).forEach(v=>{if(v?.isTexture)v.dispose();});m.dispose();});}});
   renderer.dispose();renderer.domElement.remove();
  }};
