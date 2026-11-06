@@ -1628,6 +1628,19 @@ body.story3d-failed #scene3d-root{display:none}
 }
 
 
+/* CHAPTER 10 — EXTENDED SCROLL WINDOW
+   Give the scrubbed return-to-Earth sequence three viewport-heights
+   of scroll distance. Keep the text layout at one viewport so the
+   longer section does not stretch or reposition its foreground copy.
+*/
+#scene-10 {
+  min-height: 300svh;
+  height: 300svh;
+}
+#scene-10 .scene-content {
+  height: 100svh;
+}
+
 /* CHAPTER 10 — THREE.JS RETURN JOURNEY */
 #scene-10.scene3d-ready .background-layer,
 #scene-10.scene3d-ready .nebula-layer,
