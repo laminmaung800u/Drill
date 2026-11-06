@@ -1651,3 +1651,81 @@ body.story3d-failed #scene3d-root{display:none}
 @media(prefers-reduced-motion:reduce) {
   #scene-10.scene3d-ready .scene-content { text-shadow:0 2px 12px rgba(0,0,0,.72); }
 }
+
+
+/* CHAPTER 11 — EARTH DAYTIME HOMEcoming */
+#scene-11 {
+  min-height: 100svh;
+  height: 100svh;
+  overflow: hidden;
+  background: #83c9f4;
+}
+#scene-11.scene3d-ready .background-layer,
+#scene-11.scene3d-ready .stars-layer,
+#scene-11.scene3d-ready .dust-layer,
+#scene-11.scene3d-ready .final-bus {
+  display: none !important;
+}
+#scene-11.scene3d-ready .chapter-eleven-content {
+  position: relative;
+  z-index: 3;
+  width: min(760px, calc(100% - 48px));
+  margin: 0 auto;
+  padding-top: clamp(72px, 10vh, 112px);
+  align-items: center;
+  text-align: center;
+  pointer-events: none;
+  text-shadow: 0 2px 20px rgba(20, 54, 34, .45);
+}
+#scene-11.scene3d-ready .eyebrow {
+  color: #fff4d7;
+}
+#scene-11.scene3d-ready .final-title {
+  margin: 10px 0 20px;
+  font-size: clamp(36px, 5vw, 66px);
+  line-height: .98;
+}
+#scene-11.scene3d-ready .final-title span {
+  color: #fff0c4;
+}
+.final-narration {
+  width: min(720px, 100%);
+  margin: 0 auto;
+}
+.final-narration p {
+  margin: 0 auto 12px;
+  max-width: 690px;
+  color: #fff;
+  font-size: clamp(15px, 1.45vw, 19px);
+  line-height: 1.5;
+  font-weight: 500;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 700ms ease, transform 700ms ease;
+}
+.final-narration p.is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+.final-narration p:last-child {
+  color: #fff0c4;
+  font-weight: 700;
+}
+@media(max-width:620px) {
+  #scene-11.scene3d-ready .chapter-eleven-content {
+    width: calc(100% - 32px);
+    padding-top: 78px;
+  }
+  #scene-11.scene3d-ready .final-title {
+    font-size: clamp(34px, 10vw, 48px);
+    margin-bottom: 16px;
+  }
+  .final-narration p {
+    font-size: clamp(12px, 3.3vw, 15px);
+    line-height: 1.4;
+    margin-bottom: 8px;
+  }
+}
+@media(prefers-reduced-motion:reduce) {
+  .final-narration p { transition: none; transform: none; }
+}
