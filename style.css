@@ -1626,3 +1626,15 @@ body.story3d-failed #scene3d-root{display:none}
 @media(prefers-reduced-motion:reduce) {
   #scene-09 .insight-caption p { transition:none; transform:none; }
 }
+
+
+/* CHAPTER 10 — THREE.JS RETURN JOURNEY */
+#scene-10.scene3d-ready .background-layer,
+#scene-10.scene3d-ready .nebula-layer,
+#scene-10.scene3d-ready .stars-layer,
+#scene-10.scene3d-ready .home-earth-orb { display:none!important; }
+#scene-10.scene3d-ready [data-travel-bus] { visibility:hidden!important; }
+#scene-10.scene3d-ready .scene-content { text-shadow:0 2px 18px rgba(0,0,0,.72); }
+@media(prefers-reduced-motion:reduce) {
+  #scene-10.scene3d-ready .scene-content { text-shadow:0 2px 12px rgba(0,0,0,.72); }
+}
