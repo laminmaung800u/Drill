@@ -124,6 +124,20 @@ a:focus-visible {
   overflow: hidden;
 }
 
+
+/* CHAPTER 02 — EXTENDED MOONBOUND FLIGHT
+   Add one quarter-viewport of scroll distance so the bus has more time
+   to approach the Moon. Keep the chapter copy within the original
+   viewport height rather than stretching it with the longer section. */
+#scene-02 {
+  min-height: 125svh;
+  height: 125svh;
+}
+
+#scene-02 .scene-content {
+  height: 100svh;
+}
+
 /* Chapter 3 gets a little more scroll time for the lunar arrival.
    Keep its foreground layout at one viewport tall so the copy stays
    in its original position while the section and scrubbed 3D scene
