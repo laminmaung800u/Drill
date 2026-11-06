@@ -951,9 +951,15 @@ export async function createStoryExperience({mount,landingScene,travelScene,mars
   .to(camera.position,{x:mobile?.12:.2,y:mobile?-.05:.02,z:mobile?10.7:10.9,duration:.42},.58);
 
  // CHAPTER 11 — zoom through Earth's globe into the daytime homecoming landscape.
- const finalJourney=gsap.timeline({scrollTrigger:{
-  trigger:finalScene,start:"top bottom",end:"top top",scrub:1.1,invalidateOnRefresh:true
- }});
+ const finalJourney=gsap.timeline({
+  scrollTrigger:{
+   trigger:finalScene,start:"top bottom",end:"top top",scrub:1.1,invalidateOnRefresh:true
+  },
+  onUpdate:()=>{
+   if(finalJourney.progress()>.55)busFloat?.pause();
+   else if(!reduced)busFloat?.resume();
+  }
+ });
  finalJourney
   .to(earthGroup.position,{x:0,y:0,z:3.25,duration:.52,ease:"none"},0)
   .to(earthGroup.scale,{x:4.15,y:4.15,z:4.15,duration:.52,ease:"none"},0)
