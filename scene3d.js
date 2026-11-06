@@ -617,7 +617,7 @@ export async function createStoryExperience({mount,landingScene,travelScene,mars
  // CHAPTER 8 — add Spirit beside Opportunity in the same Martian landscape.
  // Opportunity remains in the shared scene; Spirit joins as a second rover.
  const spiritRoot=new THREE.Group();
- spiritRoot.position.set(mobile?1.35:1.65,-2.13,-5.05);
+ spiritRoot.position.set(mobile?3.8:4.2,-2.13,-5.05);
  spiritRoot.rotation.y=mobile?-.12:-.18;
  spiritRoot.visible=false;
  marsSurfaceGroup.add(spiritRoot);
@@ -784,7 +784,6 @@ export async function createStoryExperience({mount,landingScene,travelScene,mars
  spiritArrival
   .to(opportunityRoot.position,{x:mobile?-1.05:-1.55,y:-2.13,z:-4.9,duration:.72},0)
   .to(spiritRoot.position,{x:mobile?1.15:1.65,y:-2.13,z:-5.05,duration:.72},0)
-  .to(spiritRoot.scale,{x:mobile?1:1,y:mobile?1:1,z:mobile?1:1,duration:.01},0)
   .to(camera.position,{x:mobile?-.05:-.12,y:mobile?1.5:1.58,z:mobile?8.2:8.35,duration:.72},0)
   .to(camera.rotation,{x:-.105,y:0,z:0,duration:.72},0);
 
