@@ -1483,3 +1483,19 @@ body.story3d-failed #scene3d-root{display:none}
   position: relative;
   z-index: 2;
 }
+
+
+/* CHAPTER 07 — 3D OPPORTUNITY ON THE MARTIAN SURFACE */
+#scene-07 { min-height:125svh; height:125svh; }
+#scene-07 .scene-content { height:100svh; }
+#scene-07.scene3d-ready .background-layer,#scene-07.scene3d-ready .mars-horizon,#scene-07.scene3d-ready .particle-field { display:none!important; }
+#scene-07.scene3d-ready .character-stage { display:none!important; }
+#scene-07.scene3d-ready .scene-content { display:flex;align-items:center;justify-content:flex-end; }
+#scene-07.scene3d-ready .object-copy { width:min(48%,590px);max-width:590px;padding:clamp(18px,3vh,38px) 0;text-shadow:0 2px 18px rgba(0,0,0,.78); }
+#scene-07.scene3d-ready .scene-title { font-size:clamp(34px,4.7vw,62px); }
+#scene-07.scene3d-ready .object-tagline { margin-bottom:0; }
+#scene-07.scene3d-ready .read-about-button { margin-top:2px; }
+.opportunity-caption { max-width:570px; }
+@media(max-width:900px){#scene-07 .scene-content{height:100svh}#scene-07.scene3d-ready .scene-content{display:block;width:calc(100% - 34px);padding-top:clamp(82px,12vh,116px)}#scene-07.scene3d-ready .object-copy{width:min(64%,470px);max-width:470px;margin-left:auto;padding:0}#scene-07.scene3d-ready .scene-title{font-size:clamp(28px,5.6vw,44px)}}
+@media(max-width:620px){#scene-07.scene3d-ready .scene-content{width:calc(100% - 28px);padding-top:76px}#scene-07.scene3d-ready .object-copy{width:min(72%,390px)}#scene-07.scene3d-ready .scene-title{font-size:clamp(24px,6.1vw,34px)}#scene-07.scene3d-ready .eyebrow{font-size:8px}#scene-07.scene3d-ready .read-about-button{padding:11px 14px;font-size:9px}}
+@media(prefers-reduced-motion:reduce){.opportunity-caption p{transition:none;transform:none}}
