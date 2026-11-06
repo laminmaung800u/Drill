@@ -603,7 +603,7 @@ export async function createStoryExperience({mount,landingScene,travelScene,mars
  for(let i=0;i<(mobile?38:64);i++){const size=.12+Math.random()*.52,rock=new THREE.Mesh(new THREE.DodecahedronGeometry(size,0),marsRockMaterials[i%marsRockMaterials.length]),z=3-Math.random()*32,x=(Math.random()-.5)*(z>-8?23:36);rock.position.set(x,-2.02+Math.random()*.09,z);rock.rotation.set(Math.random()*1.2,Math.random()*Math.PI,Math.random()*1.2);rock.scale.set(.8+Math.random()*.8,.5+Math.random()*.75,.75+Math.random()*.8);rock.castShadow=true;rock.receiveShadow=true;marsSurfaceGroup.add(rock);}
 
  // Load Opportunity shortly before Chapter 7 enters view; retain its original artwork as fallback.
- const opportunityRoot=new THREE.Group();opportunityRoot.position.set(mobile?.55:1.05,-2.13,-4.9);opportunityRoot.rotation.y=mobile?-.08:-.16;opportunityRoot.visible=false;marsSurfaceGroup.add(opportunityRoot);
+ const opportunityRoot=new THREE.Group();opportunityRoot.position.set(mobile?-.2:-.65,-2.13,-4.9);opportunityRoot.rotation.y=mobile?-.08:-.16;opportunityRoot.visible=false;marsSurfaceGroup.add(opportunityRoot);
  let opportunityLoaded=false;const opportunityLoader=new GLTFLoader();
  const loadOpportunityModel=()=>{if(opportunityLoaded||disposed)return;opportunityLoader.load("./assets/models/opportunity-rover.glb",gltf=>{
   if(disposed){gltf.scene.traverse(o=>{o.geometry?.dispose();if(o.material)(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>{Object.values(m).forEach(v=>{if(v?.isTexture)v.dispose();});m.dispose();});});return;}
@@ -715,7 +715,7 @@ export async function createStoryExperience({mount,landingScene,travelScene,mars
   .to(marsSurfaceGroup.scale,{x:1,y:1,z:1,duration:.58},.08)
   .to(camera.position,{x:mobile?-.12:-.28,y:mobile?1.5:1.58,z:mobile?8.2:8.35,duration:.62},.04)
   .to(camera.rotation,{x:-.105,y:0,z:0,duration:.62},.04)
-  .to(opportunityRoot.position,{x:mobile?.55:1.05,y:-2.13,z:-4.9,duration:.62},.12);
+  .to(opportunityRoot.position,{x:mobile?-.2:-.65,y:-2.13,z:-4.9,duration:.62},.12);
 
  // CHAPTER 6 — transition from the lunar surface into a Mars-bound flight.
   // Reuse the exact 3D bus and star field already built for Chapters 1–2.
