@@ -1514,6 +1514,7 @@ async function initialize3DExperience() {
       surfaceScene,
       lrvScene,
       alsepScene,
+      opportunityScene,
       gsap: window.gsap,
       ScrollTrigger: window.ScrollTrigger
     });
@@ -1532,6 +1533,7 @@ async function initialize3DExperience() {
     surfaceScene.classList.add("scene3d-failed");
     lrvScene.classList.add("scene3d-failed");
     alsepScene.classList.add("scene3d-failed");
+    opportunityScene.classList.add("scene3d-failed");
     document.body.classList.add("story3d-failed");
     console.warn("Shared Chapter 1–7 3D experience unavailable; retaining the original 2D scenes.", error);
   }
