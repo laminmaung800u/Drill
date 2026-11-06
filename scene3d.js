@@ -654,6 +654,9 @@ export async function createStoryExperience({mount,landingScene,travelScene,mars
     else if(object.material)object.material.needsUpdate=true;
    });
    spiritRoot.add(model);
+   // The parent group starts hidden so Spirit stays absent until its GLB is ready.
+   // Explicitly reveal it now that the model has loaded successfully.
+   spiritRoot.visible=true;
    spiritLoaded=true;
    spiritScene.classList.add("scene3d-ready");
    spiritScene.classList.remove("scene3d-failed");
