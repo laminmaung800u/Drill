@@ -707,7 +707,14 @@ export async function createStoryExperience({mount,landingScene,travelScene,mars
 
  // CHAPTER 7 — arrive on Mars and settle into the rover's surface-level story.
  // Keep the shared star field; transition from the distant globe to the Martian landscape.
- const opportunityArrival=gsap.timeline({scrollTrigger:{trigger:opportunityScene,start:"top top",end:"bottom top",scrub:1.05,invalidateOnRefresh:true}});
+ const opportunityArrival=gsap.timeline({
+  scrollTrigger:{trigger:opportunityScene,start:"top top",end:"bottom top",scrub:1.05,invalidateOnRefresh:true},
+  onUpdate:()=>{
+    // Keep the distant Mars globe visible during the approach, then remove it
+    // completely once the landing transition has finished. Reverse scrolling restores it.
+    marsGroup.visible=opportunityArrival.progress()<.38;
+  }
+ });
  opportunityArrival
   .to(marsGroup.position,{x:mobile?5.8:7.2,y:4.2,z:-8,duration:.38},0)
   .to(marsGroup.scale,{x:.001,y:.001,z:.001,duration:.38},0)
