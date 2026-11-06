@@ -6,8 +6,8 @@
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js";
 import { GLTFLoader } from "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/loaders/GLTFLoader.js";
 
-export async function createStoryExperience({mount,landingScene,travelScene,marsTravelScene,surfaceScene,lrvScene,alsepScene,opportunityScene,spiritScene,insightScene,gsap,ScrollTrigger}){
- if(!mount||!landingScene||!travelScene||!marsTravelScene||!surfaceScene||!lrvScene||!alsepScene||!opportunityScene||!spiritScene||!insightScene||!gsap||!ScrollTrigger)throw new Error("Missing 3D mount, story scenes or animation dependencies.");
+export async function createStoryExperience({mount,landingScene,travelScene,marsTravelScene,surfaceScene,lrvScene,alsepScene,opportunityScene,spiritScene,insightScene,returnScene,gsap,ScrollTrigger}){
+ if(!mount||!landingScene||!travelScene||!marsTravelScene||!surfaceScene||!lrvScene||!alsepScene||!opportunityScene||!spiritScene||!insightScene||!returnScene||!gsap||!ScrollTrigger)throw new Error("Missing 3D mount, story scenes or animation dependencies.");
  const reduced=matchMedia("(prefers-reduced-motion: reduce)").matches;
  const mobile=matchMedia("(max-width: 620px)").matches;
  const lowPower=(navigator.hardwareConcurrency||4)<=4;
@@ -856,6 +856,28 @@ export async function createStoryExperience({mount,landingScene,travelScene,mars
   .to(camera.position,{x:mobile?-.05:-.08,y:mobile?1.5:1.58,z:mobile?8.2:8.35,duration:.72},0)
   .to(camera.rotation,{x:-.105,y:0,z:0,duration:.72},0);
 
+ // CHAPTER 10 — pull back from Mars and begin the journey home.
+ // Reuse the same 3D bus, starfield and procedural Earth from Chapters 1–2.
+ // The Mars landscape and all three explorers recede as the camera returns to space.
+ const returnJourney=gsap.timeline({scrollTrigger:{
+  trigger:returnScene,start:"top top",end:"bottom top",scrub:1.15,invalidateOnRefresh:true
+ }});
+ returnJourney
+  .to(camera.position,{x:0,y:0,z:11.6,duration:.34},0)
+  .to(camera.rotation,{x:0,y:0,z:0,duration:.34},0)
+  .to(marsSurfaceGroup.scale,{x:.001,y:.001,z:.001,duration:.34},0)
+  .to(marsGroup.scale,{x:.001,y:.001,z:.001,duration:.28},0)
+  .to(earthGroup.position,{x:mobile?2.35:3.45,y:mobile?.15:.1,z:-3.5,duration:.72},.12)
+  .to(earthGroup.scale,{x:mobile?.68:.92,y:mobile?.68:.92,z:mobile?.68:.92,duration:.72},.12)
+  .fromTo(bus.position,
+   {x:mobile?-2.55:-3.05,y:.28,z:.85},
+   {x:mobile?.65:.9,y:mobile?.22:.28,z:.45,duration:.9,ease:"none"},0)
+  .fromTo(bus.scale,
+   {x:.001,y:.001,z:.001},
+   {x:mobile?.56:.68,y:mobile?.56:.68,z:mobile?.56:.68,duration:.48},0)
+  .to(bus.rotation,{x:0,y:-.12,z:-.015,duration:.82},.08)
+  .to(camera.position,{x:mobile?.12:.2,y:mobile?-.05:.02,z:mobile?10.7:10.9,duration:.42},.58);
+
  // CHAPTER 6 — transition from the lunar surface into a Mars-bound flight.
   // Reuse the exact 3D bus and star field already built for Chapters 1–2.
   // The Chapter 6 engine sound remains managed independently by script.js.
@@ -895,14 +917,14 @@ export async function createStoryExperience({mount,landingScene,travelScene,mars
    sceneVisible=visibleScenes.size>0;
    mount.classList.toggle("is-active",sceneVisible);
  },{threshold:.01});
- observer.observe(landingScene);observer.observe(travelScene);observer.observe(marsTravelScene);observer.observe(surfaceScene);observer.observe(lrvScene);observer.observe(alsepScene);observer.observe(opportunityScene);observer.observe(spiritScene);observer.observe(insightScene);
+ observer.observe(landingScene);observer.observe(travelScene);observer.observe(marsTravelScene);observer.observe(surfaceScene);observer.observe(lrvScene);observer.observe(alsepScene);observer.observe(opportunityScene);observer.observe(spiritScene);observer.observe(insightScene);observer.observe(returnScene);
  const visibility=()=>{pageVisible=!document.hidden;if(pageVisible)last=0;};
  addEventListener("resize",resize,{passive:true});document.addEventListener("visibilitychange",visibility);resize();
  const render=time=>{if(disposed)return;raf=requestAnimationFrame(render);if(!pageVisible||!sceneVisible||time-last<33)return;last=time;stars.rotation.y+=reduced?0:.00012;renderer.render(scene,camera);};
  raf=requestAnimationFrame(render);
  return{dispose(){
   if(disposed)return;disposed=true;cancelAnimationFrame(raf);observer.disconnect();removeEventListener("resize",resize);document.removeEventListener("visibilitychange",visibility);
-  journey.scrollTrigger?.kill();journey.kill();arrival.scrollTrigger?.kill();arrival.kill();roverHandoff.scrollTrigger?.kill();roverHandoff.kill();scienceHandoff.scrollTrigger?.kill();scienceHandoff.kill();marsJourney.scrollTrigger?.kill();marsJourney.kill();opportunityArrival.scrollTrigger?.kill();opportunityArrival.kill();spiritArrival.scrollTrigger?.kill();spiritArrival.kill();insightArrival.scrollTrigger?.kill();insightArrival.kill();lrvLoadTrigger.kill();alsepLoadTrigger.kill();opportunityLoadTrigger.kill();spiritLoadTrigger.kill();insightLoadTrigger.kill();busFloat?.kill();earthSpin?.kill();moonSpin?.kill();marsSpin?.kill();
+  journey.scrollTrigger?.kill();journey.kill();arrival.scrollTrigger?.kill();arrival.kill();roverHandoff.scrollTrigger?.kill();roverHandoff.kill();scienceHandoff.scrollTrigger?.kill();scienceHandoff.kill();marsJourney.scrollTrigger?.kill();marsJourney.kill();opportunityArrival.scrollTrigger?.kill();opportunityArrival.kill();spiritArrival.scrollTrigger?.kill();spiritArrival.kill();insightArrival.scrollTrigger?.kill();insightArrival.kill();returnJourney.scrollTrigger?.kill();returnJourney.kill();lrvLoadTrigger.kill();alsepLoadTrigger.kill();opportunityLoadTrigger.kill();spiritLoadTrigger.kill();insightLoadTrigger.kill();busFloat?.kill();earthSpin?.kill();moonSpin?.kill();marsSpin?.kill();
   scene.traverse(o=>{o.geometry?.dispose();if(o.material){const list=Array.isArray(o.material)?o.material:[o.material];list.forEach(m=>{Object.values(m).forEach(v=>{if(v?.isTexture)v.dispose();});m.dispose();});}});
   renderer.dispose();renderer.domElement.remove();
  }};
