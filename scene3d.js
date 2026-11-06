@@ -6,8 +6,8 @@
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js";
 import { GLTFLoader } from "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/loaders/GLTFLoader.js";
 
-export async function createStoryExperience({mount,landingScene,travelScene,marsTravelScene,surfaceScene,lrvScene,alsepScene,opportunityScene,spiritScene,insightScene,returnScene,gsap,ScrollTrigger}){
- if(!mount||!landingScene||!travelScene||!marsTravelScene||!surfaceScene||!lrvScene||!alsepScene||!opportunityScene||!spiritScene||!insightScene||!returnScene||!gsap||!ScrollTrigger)throw new Error("Missing 3D mount, story scenes or animation dependencies.");
+export async function createStoryExperience({mount,landingScene,travelScene,marsTravelScene,surfaceScene,lrvScene,alsepScene,opportunityScene,spiritScene,insightScene,returnScene,finalScene,gsap,ScrollTrigger}){
+ if(!mount||!landingScene||!travelScene||!marsTravelScene||!surfaceScene||!lrvScene||!alsepScene||!opportunityScene||!spiritScene||!insightScene||!returnScene||!finalScene||!gsap||!ScrollTrigger)throw new Error("Missing 3D mount, story scenes or animation dependencies.");
  const reduced=matchMedia("(prefers-reduced-motion: reduce)").matches;
  const mobile=matchMedia("(max-width: 620px)").matches;
  const lowPower=(navigator.hardwareConcurrency||4)<=4;
@@ -304,6 +304,82 @@ export async function createStoryExperience({mount,landingScene,travelScene,mars
  makeBox(bus,.52,.15,.035,trim,-.9,.78,.62);
  makeBox(bus,.39,.075,.02,white,-.9,.78,.645);
  const glow=new THREE.PointLight(0x4c9fff,18,12,2);glow.position.set(-1.6,1.8,3.5);scene.add(glow);
+
+ // CHAPTER 11 — a bright, welcoming Earth landscape.
+ // The group remains hidden until the globe zoom has reached its close-up.
+ const homecoming=new THREE.Group();
+ homecoming.scale.setScalar(.001);
+ scene.add(homecoming);
+
+ const daytimeSky=new THREE.Mesh(
+   new THREE.SphereGeometry(78,32,20),
+   new THREE.MeshBasicMaterial({color:0x83c9f4,side:THREE.BackSide})
+ );
+ homecoming.add(daytimeSky);
+
+ const meadow=new THREE.Mesh(
+   new THREE.PlaneGeometry(180,180,1,1),
+   new THREE.MeshStandardMaterial({color:0x69a94f,roughness:1})
+ );
+ meadow.rotation.x=-Math.PI/2;
+ meadow.position.set(0,-2.24,-28);
+ meadow.receiveShadow=true;
+ homecoming.add(meadow);
+
+ const road=new THREE.Mesh(
+   new THREE.PlaneGeometry(8.4,115),
+   new THREE.MeshStandardMaterial({color:0x454c53,roughness:.96})
+ );
+ road.rotation.x=-Math.PI/2;
+ road.position.set(0,-2.205,-25);
+ road.receiveShadow=true;
+ homecoming.add(road);
+
+ const vergeMaterials=[mat(0x579443,1),mat(0x78b957,1),mat(0x91c967,1)];
+ for(let i=0;i<(mobile?34:58);i++){
+   const side=i%2===0?-1:1,z=-4-Math.random()*43,x=side*(5.2+Math.random()*22);
+   const patch=new THREE.Mesh(new THREE.SphereGeometry(.35+Math.random()*.8,8,6),vergeMaterials[i%vergeMaterials.length]);
+   patch.position.set(x,-2.14+Math.random()*.08,z);
+   patch.scale.set(1.2,.12,.7);
+   homecoming.add(patch);
+ }
+
+ const laneMarkMaterial=new THREE.MeshBasicMaterial({color:0xf6e7a9});
+ for(let i=0;i<13;i++){
+   const dash=new THREE.Mesh(new THREE.BoxGeometry(.12,.025,2.15),laneMarkMaterial);
+   dash.position.set(0,-2.185,8-i*7.3);
+   homecoming.add(dash);
+ }
+
+ const hillMaterial=[mat(0x78b65d,1),mat(0x68a653,1),mat(0x8bc56b,1)];
+ [[-24,-1.65,-48,20,5,8],[0,-1.8,-55,27,6,9],[25,-1.65,-49,22,5,8]].forEach((v,i)=>{
+   const hill=new THREE.Mesh(new THREE.SphereGeometry(1,24,16),hillMaterial[i]);
+   hill.position.set(v[0],v[1],v[2]);hill.scale.set(v[3],v[4],v[5]);homecoming.add(hill);
+ });
+
+ const cloudMaterial=new THREE.MeshStandardMaterial({color:0xffffff,roughness:1});
+ for(let i=0;i<(mobile?5:8);i++){
+   const cloud=new THREE.Group(),x=(i-(mobile?2:3.5))*9,z=-23-(i%3)*10,y=7+(i%2)*2;
+   [[0,0,0,1.6],[1.15,.12,0,1.25],[-1.05,.08,.08,1.15],[.25,.55,0,1.05]].forEach(([cx,cy,cz,r])=>{
+     const puff=new THREE.Mesh(new THREE.SphereGeometry(r,12,9),cloudMaterial);
+     puff.position.set(cx,cy,cz);puff.scale.y=.68;cloud.add(puff);
+   });
+   cloud.position.set(x,y,z);homecoming.add(cloud);
+ }
+
+ // A few tiny wildflowers add a friendly storybook finish to the grass verge.
+ const flowerStem=mat(0x3e7837,1),flowerPetals=[mat(0xffe8a5,1),mat(0xffffff,1),mat(0xffd1dc,1)];
+ for(let i=0;i<(mobile?16:28);i++){
+   const x=(Math.random()-.5)*28,z=-3-Math.random()*26;
+   if(Math.abs(x)<5.2)continue;
+   const stem=new THREE.Mesh(new THREE.CylinderGeometry(.018,.024,.24,5),flowerStem);
+   stem.position.set(x,-2.02,z);homecoming.add(stem);
+   const bloom=new THREE.Mesh(new THREE.SphereGeometry(.075,8,6),flowerPetals[i%flowerPetals.length]);
+   bloom.position.set(x,-1.89,z);homecoming.add(bloom);
+ }
+
+ // Park BUSSY on the road, facing the viewer, and stop its in-flight bob.
+
 
 
  // CHAPTER 3 — FIRST-PERSON LUNAR SURFACE
@@ -874,6 +950,22 @@ export async function createStoryExperience({mount,landingScene,travelScene,mars
   .to(bus.rotation,{x:0,y:-.12,z:-.015,duration:.82},.08)
   .to(camera.position,{x:mobile?.12:.2,y:mobile?-.05:.02,z:mobile?10.7:10.9,duration:.42},.58);
 
+ // CHAPTER 11 — zoom through Earth's globe into the daytime homecoming landscape.
+ const finalJourney=gsap.timeline({scrollTrigger:{
+  trigger:finalScene,start:"top bottom",end:"top top",scrub:1.1,invalidateOnRefresh:true
+ }});
+ finalJourney
+  .to(earthGroup.position,{x:0,y:0,z:3.25,duration:.52,ease:"none"},0)
+  .to(earthGroup.scale,{x:4.15,y:4.15,z:4.15,duration:.52,ease:"none"},0)
+  .to(camera.position,{x:0,y:.1,z:10.25,duration:.52,ease:"none"},0)
+  .to(earthGroup.scale,{x:.001,y:.001,z:.001,duration:.25,ease:"none"},.48)
+  .to(homecoming.scale,{x:1,y:1,z:1,duration:.34,ease:"power1.inOut"},.48)
+  .to(camera.position,{x:0,y:1.55,z:12.2,duration:.52,ease:"power1.inOut"},.48)
+  .to(camera.rotation,{x:-.105,y:0,z:0,duration:.52,ease:"power1.inOut"},.48)
+  .to(bus.position,{x:0,y:-1.47,z:1.15,duration:.38,ease:"power1.inOut"},.56)
+  .to(bus.scale,{x:mobile?.86:1.02,y:mobile?.86:1.02,z:mobile?.86:1.02,duration:.38,ease:"power1.inOut"},.56)
+  .to(bus.rotation,{x:0,y:-Math.PI/2,z:0,duration:.38,ease:"power1.inOut"},.56);
+
  // CHAPTER 6 — transition from the lunar surface into a Mars-bound flight.
   // Reuse the exact 3D bus and star field already built for Chapters 1–2.
   // The Chapter 6 engine sound remains managed independently by script.js.
@@ -913,14 +1005,14 @@ export async function createStoryExperience({mount,landingScene,travelScene,mars
    sceneVisible=visibleScenes.size>0;
    mount.classList.toggle("is-active",sceneVisible);
  },{threshold:.01});
- observer.observe(landingScene);observer.observe(travelScene);observer.observe(marsTravelScene);observer.observe(surfaceScene);observer.observe(lrvScene);observer.observe(alsepScene);observer.observe(opportunityScene);observer.observe(spiritScene);observer.observe(insightScene);observer.observe(returnScene);
+ observer.observe(landingScene);observer.observe(travelScene);observer.observe(marsTravelScene);observer.observe(surfaceScene);observer.observe(lrvScene);observer.observe(alsepScene);observer.observe(opportunityScene);observer.observe(spiritScene);observer.observe(insightScene);observer.observe(returnScene);observer.observe(finalScene);
  const visibility=()=>{pageVisible=!document.hidden;if(pageVisible)last=0;};
  addEventListener("resize",resize,{passive:true});document.addEventListener("visibilitychange",visibility);resize();
  const render=time=>{if(disposed)return;raf=requestAnimationFrame(render);if(!pageVisible||!sceneVisible||time-last<33)return;last=time;stars.rotation.y+=reduced?0:.00012;renderer.render(scene,camera);};
  raf=requestAnimationFrame(render);
  return{dispose(){
   if(disposed)return;disposed=true;cancelAnimationFrame(raf);observer.disconnect();removeEventListener("resize",resize);document.removeEventListener("visibilitychange",visibility);
-  journey.scrollTrigger?.kill();journey.kill();arrival.scrollTrigger?.kill();arrival.kill();roverHandoff.scrollTrigger?.kill();roverHandoff.kill();scienceHandoff.scrollTrigger?.kill();scienceHandoff.kill();marsJourney.scrollTrigger?.kill();marsJourney.kill();opportunityArrival.scrollTrigger?.kill();opportunityArrival.kill();spiritArrival.scrollTrigger?.kill();spiritArrival.kill();insightArrival.scrollTrigger?.kill();insightArrival.kill();returnJourney.scrollTrigger?.kill();returnJourney.kill();lrvLoadTrigger.kill();alsepLoadTrigger.kill();opportunityLoadTrigger.kill();spiritLoadTrigger.kill();insightLoadTrigger.kill();busFloat?.kill();earthSpin?.kill();moonSpin?.kill();marsSpin?.kill();
+  journey.scrollTrigger?.kill();journey.kill();arrival.scrollTrigger?.kill();arrival.kill();roverHandoff.scrollTrigger?.kill();roverHandoff.kill();scienceHandoff.scrollTrigger?.kill();scienceHandoff.kill();marsJourney.scrollTrigger?.kill();marsJourney.kill();opportunityArrival.scrollTrigger?.kill();opportunityArrival.kill();spiritArrival.scrollTrigger?.kill();spiritArrival.kill();insightArrival.scrollTrigger?.kill();insightArrival.kill();returnJourney.scrollTrigger?.kill();returnJourney.kill();finalJourney.scrollTrigger?.kill();finalJourney.kill();lrvLoadTrigger.kill();alsepLoadTrigger.kill();opportunityLoadTrigger.kill();spiritLoadTrigger.kill();insightLoadTrigger.kill();busFloat?.kill();earthSpin?.kill();moonSpin?.kill();marsSpin?.kill();
   scene.traverse(o=>{o.geometry?.dispose();if(o.material){const list=Array.isArray(o.material)?o.material:[o.material];list.forEach(m=>{Object.values(m).forEach(v=>{if(v?.isTexture)v.dispose();});m.dispose();});}});
   renderer.dispose();renderer.domElement.remove();
  }};
